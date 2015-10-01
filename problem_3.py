@@ -27,6 +27,17 @@ def ridgeRegression(X, Y, l=0, M=1, features=False):
 
 	theta = np.dot(firstTerm, np.dot(secondTerm, thirdTerm))
 
+	#Xprime = np.vstack([features, np.sqrt(l)*np.identity(features.shape[1])])
+	#yprime = np.vstack([Y, np.zeros(features.shape[1]).reshape(-1, 1)])
+    #
+	#thetaprime = np.dot(linalg.pinv(Xprime), yprime)
+	#print linalg.pinv(X).shape
+	#print Y.shape
+	#thetadoubleprime = np.dot(linalg.pinv(features), Y)
+	#print thetaprime
+	#print theta
+	#print thetadoubleprime
+
 	return theta
 
 def predictRidge(X, theta, features=False):
