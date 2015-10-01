@@ -88,8 +88,10 @@ Lambda = 5
 
 thetaInit = np.random.rand(12).reshape(-1, 1)
 
+## These don't always converge - might be because the actual function is sinusoidal?
 thetaLASSO = gradientDescent(f=LASSOLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.00001, crit=.006, maxIter=1000000)
 thetaRidge = gradientDescent(f=ridgeRegressionLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.00001, crit=.006, maxIter=1000000)
+
 LASSOPredictions = predict(thetaLASSO, X_test)
 ridgePredictions = predict(thetaRidge, X_test)
 LASSOPredictionsTrain = predict(thetaLASSO, X_train)
@@ -104,3 +106,4 @@ pylab.plot(X_test[:1,].flatten(), Y_test.flatten(), 'ro',
 	X_test[:1,].flatten(), LASSOPredictions.flatten(), 'bo',
 	X_test[:1,].flatten(), ridgePredictions.flatten(), 'go')
 pylab.show()
+
