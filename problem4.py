@@ -3,11 +3,12 @@ import scipy.optimize as spo
 import pandas as pd 
 import scipy
 import scipy.io
+import pylab
 
 np.set_printoptions(precision=4)
 
 # Generic gradient descent function
-def gradientDescent(f, df, init, lr=0.3, crit=0.0001, maxIter=1000, h=0.001):
+def gradientDescent(f, df, init, lr=0.3, crit=0.0001, maxIter=100000, h=0.001):
 	count = 0
 	nIter = 0
 	fcall = 0
@@ -29,7 +30,9 @@ def gradientDescent(f, df, init, lr=0.3, crit=0.0001, maxIter=1000, h=0.001):
 			count += 1
 		else:
 			count = 0
-
+		print 'Loss function: ', f_u
+		print 'Test MSE: ', MSE(predict(init, X_test), Y_test)
+		print 'Train MSE: ', MSE(predict(init, X_train), Y_train_val)
 	print "nIter: %d" % (nIter)
 	print "Fcall: %d" % (fcall)
 	return init
@@ -59,20 +62,45 @@ def ridgeRegressionLoss(theta):
 def LASSOLoss(theta):
 	XTtheta = np.dot(np.transpose(X_train), theta)
 	diff = Y_train - XTtheta
-	loss = np.dot(np.transpose((diff)), diff)*(1/Y_train.size) + Lambda * np.sum(np.absolute(theta))
+	loss = np.sum(np.dot(np.transpose((diff)), diff))*(1/Y_train.size) + Lambda * np.sum(np.absolute(theta))
 
 	return loss
+
+def predict(theta, X):
+	prediction = np.dot(np.transpose(X), theta)
+
+	return prediction 
+
+def MSE(predictions, actuals):
+	mse = np.dot((np.transpose(predictions)-actuals), np.transpose(np.transpose(predictions)-actuals))/float(predictions.size)
+
+	return mse 
 
 
 variables = scipy.io.loadmat('/Users/dholtz/Downloads/6867_hw1_data/regress-highdim.mat')
 X_train = variables['X_train']
 X_test = variables['X_test']
 Y_train = variables['Y_train']
+Y_train_val = Y_train
 Y_train = Y_train.reshape(-1, 1)	
 Y_test = variables['Y_test']
 Lambda = 5
 
-thetaInit = np.ones(X_train.shape[0]).reshape(-1, 1)
+thetaInit = np.random.rand(12).reshape(-1, 1)
 
-thetaRidge = gradientDescent(f=LASSOLoss, df=centdiff, init=thetaInit)
-print thetaRidge
+thetaLASSO = gradientDescent(f=LASSOLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.00001, crit=.006, maxIter=1000000)
+thetaRidge = gradientDescent(f=ridgeRegressionLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.00001, crit=.006, maxIter=1000000)
+LASSOPredictions = predict(thetaLASSO, X_test)
+ridgePredictions = predict(thetaRidge, X_test)
+LASSOPredictionsTrain = predict(thetaLASSO, X_train)
+ridgePredictionsTrain = predict(thetaRidge, X_train)
+
+pylab.plot(X_train[:1,].flatten(), Y_train.flatten(), 'ro',
+	X_train[:1,].flatten(), LASSOPredictionsTrain.flatten(), 'bo',
+	X_train[:1,].flatten(), ridgePredictionsTrain.flatten(), 'go')
+pylab.show()
+
+pylab.plot(X_test[:1,].flatten(), Y_test.flatten(), 'ro',
+	X_test[:1,].flatten(), LASSOPredictions.flatten(), 'bo',
+	X_test[:1,].flatten(), ridgePredictions.flatten(), 'go')
+pylab.show()
