@@ -95,10 +95,8 @@ Y_train_val = Y_train
 Y_train = Y_train.reshape(-1, 1)	
 Y_test = variables['Y_test']
 W_true = variables['W_true']
-print W_true.shape
-print np.array([0]).reshape(1,-1).shape
 W_true = np.hstack([np.array([0]).reshape(1,-1), W_true])
-Lambda = 7
+Lambda = .1
 
 thetaInit = np.random.rand(13).reshape(-1, 1)
 
@@ -116,14 +114,13 @@ X_lin = np.linspace(-1, 1, 1000)
 X_lin = np.array([X_lin, np.sin(0.4*np.pi*X_lin*1), np.sin(0.4*np.pi*X_lin*2), np.sin(0.4*np.pi*X_lin*3), np.sin(0.4*np.pi*X_lin*4), np.sin(0.4*np.pi*X_lin*5), np.sin(0.4*np.pi*X_lin*6), np.sin(0.4*np.pi*X_lin*7), np.sin(0.4*np.pi*X_lin*8), np.sin(0.4*np.pi*X_lin*9), np.sin(0.4*np.pi*X_lin*10), np.sin(0.4*np.pi*X_lin*11)])
 X_lin = addInterceptTerm(X_lin)
 
-print W_true.shape 
-print X_lin.shape
 ActualPredictions = predict(np.transpose(W_true), X_lin)
 
 YLasso_lin = predict(thetaLASSO, X_lin)
 YRidge_lin = predict(thetaRidge, X_lin)
 
-#print sm.OLS(Y_test, X_test).fit().summary()
+print spo.fmin_bfgs(LASSOLoss, thetaInit)
+print thetaLASSO
 
 Lambda = 0
 
@@ -158,8 +155,6 @@ print thetaOLS
 print thetaRidge 
 print thetaLASSO
 print W_true
-
-print np.concatenate([thetaOLS, thetaRidge, thetaLASSO, np.transpose(W_true)])
 
 d = {'weights' : pd.Series(np.concatenate([thetaOLS, thetaRidge, thetaLASSO, np.transpose(W_true)]).flatten()), \
 'Models': pd.Series(np.concatenate([np.repeat(np.array(['OLS']), 13),np.repeat(np.array(['Ridge Regression']), 13),\
