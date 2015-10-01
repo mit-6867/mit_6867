@@ -144,6 +144,24 @@ The plot below shows the mean squared error (MSE) that our ridge regression fit 
 
 In order to avoid overfitting, but in order to make sure that we have chosen values of $\lambda$ and $M$ (and in general, hyperparameters) that make sense, it is common to split the data into a training set and a test set. We will use the closed-form solution for ridge regression to calculate $\hat{\theta}$ on our training set. We will then use that $\hat{\theta}$ to attempt to predict values of $\mathbf{y}$ for the test data. By choosing the $\hat{\theta}$ that minimizes MSE on the test data, but is trained on the training data, we are ensuring that we have not overfit our model to the data it is trained on. As one final step in the model selection process, we can check the performance of our final $\hat{\theta}$ on a validation set, to make sure that performance is still good (and we have not overfit for performance on our test set).
 
+We use this methodology to find the best $\lambda$ and $M$ given three datasets similar to the bishop data. We calculate $\lambda$ and $M$ using the regress\_train.txt, data we validate using regress\_test.txt, and then we test using regress\_validate.txt. We search through a grid of various values for $\lambda$ and $M$, and find that $MSE$ is lowest on the validation set when $\lambda = 1$ and $M = 1$: $MSE = 1.776$ on the validation data set. These parameters gave us an $MSE$ of 1.460 on the training data and and an $MSE$ of 1.415 on the test data. The fact that our $MSE$ is on the same order of magnitude for the test data is a good sign - it indicates that in making sure we didn't overfit to the training data, we didn't accidentally overfit to the validation data.
+
+The $MSE$ for various combinations of $\lambda$ and $M$ on the three datasets (including our chosen set of hyperparameters) is found below. We see that with large $M$ and small $\lambda$, we do great on the training data, but bad on our validation data. For large values of both $\lambda$ and $M$, we do well, but not as well as our optimal values we found through the grid search.
+
+Let's now use this methodology on a real dataset, as opposed to a toy dataset. The dataset that we will use was compiled by Kirsztian Buza at Budapest University of Technology and Economics. It includes 280 numerical values describing a number of blog posts, such as day of week, number of parent pages, and number of comments received within 24 hours. We are hoping to predict the number of comments it will receive in the next 24 hours. We are given this data split into training, validation, and test datasets, so we will once again perform a grid search to find the optimal value of $\lambda$. In this particular case, we are not regressing a polynomial of arbitrary order, so we do not need to test different values of $M$.
+
+\begin{center}
+\includegraphics[scale=.4]{MSE_comparison.png}
+\end{center}
+
+We find that for very large $\lambda$ (as large as $10^6$, $MSE$ continues to decrease, although it is always close to 900. The MSE for a uniform predictor that predicts the average of $y$, $\hat{y}$, has an MSE of 1453, so the performance of our model is still better. However, we see that for values of $\lambda$ higher than $10^6$ or so, the value of the MSE increases, and eventually approaches (and eclipses) the MSE of our uniform estimator.
+
+This isn't surprising - the blog feedback dataset is large, with 10,480 observations in the test set. If we interpret the value of $\lambda$ as strength of our prior, it makes sense that it does not have a substantial effect until it is significantly larger than the size of our data. Furthermore, the inability of our model to get very low MSE for low $\lambda$ speaks both to the fact that the data has a much higher dimension than our training data, and also suggests that the simple linear model we are using here may not be a very good fit for the data.
+
+\begin{center}
+\includegraphics[scale=.4]{BlogFeedbackRegressionMSE.png}
+\end{center}
+
 
 \subsubsection*{Problem 4}
 
