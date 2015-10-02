@@ -22,7 +22,7 @@
 	
 \subsubsection*{Problem 1}
 
-We implemented gradient descent in Python using an algorithm similar to the pseudocode below. The function is written in such a way that it can accept arbitrary scalar functions $f$ and gradients, $\nabla f(x)$, where $f(x)$ here is a function of an arbitrary number of parameters, $n$, and return $\min{f(x)}$.
+We implemented a rather naive gradient descent in Python using an algorithm similar to the pseudocode below. The function is written in such a way that it can accept arbitrary scalar functions $f$ and their gradients, $\nabla f(x)$, where $x$ can be a vector of arbitrary length, $n$. The goal of this function is to try and return $\arg\min_x {f(x)}$.
 
 \begin{algorithm}
 \caption{Gradient Descent}
@@ -42,11 +42,15 @@ We implemented gradient descent in Python using an algorithm similar to the pseu
 \end{algorithmic}
 \end{algorithm}
 
-In order to understand the effect of various hyperparameters (our initial guess, the step size, and the convergence criteria) of the algorithm, we compared the results of our gradient descent routine given a number of different parameter combinations for two different functions: $f(x) = \sum_i^n x_i^2$ and $f(x) = \sum_i^n x_i^{\frac{2}{100}} + \cos(x)$. The first of these is a convex function, whereas the second is quite non-convex, with many local minima. The results of our gradient descent algorithm for numerous values are found below.
+In order to understand the effect of various hyperparameters (our initial guess, the step size, and the convergence criteria) of the algorithm, we compared the results of our gradient descent routine given a number of different parameter combinations for two different functions: $f(x) = \sum_i^n x_i^2$ and $f(x) = \sum_i^n \frac{1}{100}x_i^2 - \cos(x)$. The first of these is a convex function, whereas the second is quite non-convex, with many local minima. The results of our gradient descent algorithm for numerous values are found below in Table 1.
 
-We find that, in general, the convex function is much better behaved. Regardless of our initial guess or our learning rate, the algorithm converges to a guess in fewer than 1,000 steps, and these guess are consistently close to $x = (0,0,0,0)$, the ``true" value. The final guess' distance from the true value of $x$ is primarily a function of the convergence criteria, which makes sense - the less picky we are with our convergence criteria, the further from the true value of $x$ our final guess will be.
+We find that, in general, the convex function behaves considerably better. Regardless of our initial guess or our learning rate, the algorithm returns a guess in fewer than 1,000 steps, and these guesses are consistently close to $x = (0,0,0,0)$, the "true" value. The final guess' distance from the true value of $x$ is primarily a function of the convergence criteria, which makes sense - the less picky we are with our convergence criteria, the further from the true value of $x$ our final guess will be.
 
-The non-convex, on the other hand, is much more sensitive to the hyperparameters we specify. The most notable departure from the convex function is the influence of our initial guess. It is much easier for the gradient descent algorithm to get trapped in local minima, and this is clearly illustrated in our results. While this is the most obvious difference, note that changes in both the learning rate and the convergence criteria also lead to non-trivially different guesses for $\min{f(x)}$.
+The non-convex function, on the other hand, is much more sensitive to the hyperparameters we specify. The most notable departure from the convex function is the influence of our initial guess. It is much easier for our gradient descent algorithm to get trapped in local minima, and this is clearly illustrated in our results. While this is the most obvious difference, note that changes in both the learning rate and the convergence criteria also lead to non-trivially different guesses for $\arg\min_x {f(x)}$.
+
+Generally speaking, choice of starting value is only in when were are dealing with non-convex functions as different starting values may lead to different local extremums. Though if we randomly initialized good starting values, it decreases the number of iterations necessary for convergence. Tuning the step size alters the performance of the algorithm, while tuning the convergence threshold alters the accuracy of the algorithm.
+
+To elaborate on this a little, for any given convergence threshold, increasing step size will decrease the number of iterations required for convergence. However, we need make sure that the step isn't so large that the algorithm gets caught in a loop where its constantly overshooting the minimum. On the other hand, for a given step size, decreasing the convergence threshold increases accuracy of the algorithm, but at the cost of performance as it'll take additional iterations to reach the higher level of precision. Here, we want to make sure that the convergence threshold isn't so small that we can never converge.
 
 Unfortunately, it might not always be convenient to specify the gradient of our scalar function, $f(x)$, explicitly. This might be because it is complicated to compute, or because no closed form solution exists. In order to get around this issue, we can approximate the gradient of the function using central differences. We approximate the $i$th element of the gradient, $\nabla_i$, as
 
@@ -56,13 +60,13 @@ Unfortunately, it might not always be convenient to specify the gradient of our 
 
 \noindent where $h$ is some small constant (we use $h = .001$).
 
-We see that the performance in the calculation of the gradient is identical between the analytical approach and the central difference approach. That's great! Now let's see how our gradient descent algorithm compares to two other algorithms - Broyden?Fletcher?Goldfarb?Shanno (BFGS) and Conjugate Gradient (CG). We compare both the number of iterations and function evaluations. We'll consider our algorithm in two forms - one where we pass in an explicit gradient function, and another where we estimate the gradient using the central difference method. All benchmarking is done with the same starting point: [5, -3, 7, 8]. $f_1(x) =  \sum_i^n x_i^2$ and $f_2(x) = \sum_i^n x_i^{\frac{2}{100}} + \cos(x)$. We see that when passed an analytical solution for $\nabla f(x)$, our algorithm requires about as many function calls, although many more iterations than both BFGS and CG. Given we do not have an analytical expression for $\nabla f(x)$, however, our algorithm requires many more iterations and function calls.
+We see that the performance in the calculation of the gradient is identical between the analytical approach and the central difference approach. That's great! Now let's see how our gradient descent algorithm compares to two more sophisticated optimizers - BFGS and Conjugate Gradient (CG). We compare both the number of iterations and function evaluations. We'll consider our algorithm in two forms - one where we pass in an explicit gradient function, and another where we estimate the gradient using the central difference method. All benchmarking is done with the same starting point: [5, -3, 7, 8]. $f_1(x) =  \sum_i^n x_i^2$ and $f_2(x) = \sum_i^n x_i^{\frac{2}{100}} + \cos(x)$. We see that when passed an analytical solution for $\nabla f(x)$, our algorithm requires about as many function calls, although many more iterations than either BFGS or CG. If we use the central difference approximation for $\nabla f(x)$ instead, our algorithm requires many more iterations and function calls.
 
 \begin{table}
 \captionof{table}{Performance of gradient descent given various algorithm hyperparameters} 
 \begin{tabular}{llllll}
 \toprule
-{} &                        $Guess_{i}$ &      $R_{learn}$ &   Thresh. &    $Guess_{f}$ ($f(x) = \sum_i^n x_i^2$) & $Guess_{f}$ ($f(x) = \sum_i^n x_i^{\frac{2}{100}} + \cos(x)$) \\
+{} &                        $Guess_{i}$ &      step &   Thresh. &    $Guess_{f}$ ($f(x) = \sum_i^n x_i^2$) & $Guess_{f}$ ($f(x) = \sum_i^n \frac{1}{100} x_i^2 - \cos(x)$) \\
 \midrule
 &    [5.0, -3.0, 7.0, 8.0] &    0.3 &    0.1 &   [0.020, -0.012, 0.029, 0.033] &    [6.150, -0.314, 6.165, 6.176] \\
 &    [5.0, -3.0, 7.0, 8.0] &    0.3 &  0.001 &   [0.001, -0.001, 0.002, 0.002] &    [6.159, -0.025, 6.160, 6.161] \\
@@ -93,11 +97,11 @@ We see that the performance in the calculation of the gradient is identical betw
 {} &   $x_{i}$  &  function &   $\nabla_{analytical}$  & $\nabla_{approximate}$ \\
 \midrule
 &    [5.0, -3.0, 7.0, 8.0] & $f(x) = \sum_i^n x_i^2$ &  [ 10.  -6.  14.  16.] & [ 10.  -6.  14.  16.]\\
-&    [5.0, -3.0, 7.0, 8.0] & $f(x) = \sum_i^n x_i^{\frac{2}{100}} + \cos(x)$ & [-0.8589 -0.2011  0.797   1.1494] &[-0.8589 -0.2011  0.797   1.1494] \\
+&    [5.0, -3.0, 7.0, 8.0] & $f(x) = \sum_i^n \frac{1}{100} x_i^2 - \cos(x)$ & [-0.8589 -0.2011  0.797   1.1494] &[-0.8589 -0.2011  0.797   1.1494] \\
 &    [-10.   4.   1.  -5.] & $f(x) = \sum_i^n x_i^2$ &   [-20.   8.   2. -10.] &  [-20.   8.   2. -10.]\\
-&    [-10.   4.   1.  -5.] & $f(x) = \sum_i^n x_i^{\frac{2}{100}} + \cos(x)$ &[ 0.344  -0.6768  0.8615  0.8589]&[ 0.344  -0.6768  0.8615  0.8589] \\
+&    [-10.   4.   1.  -5.] & $f(x) = \sum_i^n \frac{1}{100} x_i^2 - \cos(x)$ &[ 0.344  -0.6768  0.8615  0.8589]&[ 0.344  -0.6768  0.8615  0.8589] \\
 &    [ 1. -1. -3.  2.] & $f(x) = \sum_i^n x_i^2$ &  [ 10.  -6.  14.  16.] & [ 10.  -6.  14.  16.]\\
-&    [ 1. -1. -3.  2.] & $f(x) = \sum_i^n x_i^{\frac{2}{100}} + \cos(x)$ & [ 0.8615 -0.8615 -0.2011  0.9493] & [ 0.8615 -0.8615 -0.2011  0.9493] \\
+&    [ 1. -1. -3.  2.] & $f(x) = \sum_i^n \frac{1}{100} x_i^2 - \cos(x)$ & [ 0.8615 -0.8615 -0.2011  0.9493] & [ 0.8615 -0.8615 -0.2011  0.9493] \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -105,8 +109,7 @@ We see that the performance in the calculation of the gradient is identical betw
 \begin{table}
 \captionof{table}{Performance of authors' gradient descent algorithm compared to BFGS and CG}
 \begin{tabular}{llllll}
-\toprule
-{} & algorithm & $f_1(x)$ function calls & $f_1(x)$ iterations &  $f_2(x)$ function calls &  $f_2(x)$ iterations \\
+\toprule{} & algorithm & $f_1(x)$ function calls & $f_1(x)$ iterations &  $f_2(x)$ function calls &  $f_2(x)$ iterations \\
 \midrule
   & BFGS & 24 & 2 & 78 & 10 \\
   & CG & 30 & 2 & 78 & 6 \\
@@ -118,9 +121,98 @@ We see that the performance in the calculation of the gradient is identical betw
 
 \subsubsection*{Problem 2}
 
+With problem 2, we first derive the maximum-likelihood estimator for the weight vector $\theta$. Note that if we assume Gaussian errors, that is $Y \sim N(X\theta, \sigma^2)$, then our maximum-likelihood estimator is equivalent to the OLS estimator. Hence:
+\begin{equation*}
+	\hat{\theta}_{ML}=\hat{\theta}_{OLS}=(\Phi^T \Phi)^{-1}\Phi^T Y
+\end{equation*}
+where $\Phi$ denotes the polynomial basis expansion of $X$.
+
+Using this closed form solution, we determined the maximum-likelihood weight vector for the polynomial basis expansions of $X$ of orders 0, 1, 3, and 9. Using these estimated weight vectors we obtained very similar plots to Bishop as seen below:
+
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq0.png}
+		\caption*{$M=0$}
+	\end{minipage}
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq1.png}
+		\caption*{$M=1$}
+	\end{minipage}
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq3.png}
+		\caption*{$M=3$}
+	\end{minipage}
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq9.png}
+		\caption*{$M=9$}
+	\end{minipage}
+	\caption{Plots of polynomials having various orders $M$, in red, fitted to the the observed points. The green curve shows the DGF $\sin(2\pi x)$.}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\captionof{table}{Optimal Weight Vectors for Various Polynomial Basis Expansions of $\mathbf{X}$}
+\begin{tabular}{lrrrr}
+\toprule
+{} &     $M=0$ &     $M=1$ &      $M=3$ &           $M=9$ \\
+\midrule
+$\theta_0$ &  0.186299 &  0.820212 &   0.313703 &        0.349482 \\
+$\theta_1$ &        & -1.267826 &   7.985371 &      232.682435 \\
+$\theta_2$ &        &        & -25.426102 &    -5329.068232 \\
+$\theta_3$ &        &        &  17.374077 &    48633.377984 \\
+$\theta_4$ &        &        &         &  -231944.259392 \\
+$\theta_5$ &        &        &         &   640871.190655 \\
+$\theta_6$ &        &        &         & -1063154.903003 \\
+$\theta_7$ &        &        &         &  1043711.192742 \\
+$\theta_8$ &        &        &         &  -558375.328325 \\
+$\theta_9$ &        &        &         &   125355.027159 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The sum of squared errors of a linear polynomial basis model is defined by: 
+\begin{equation*}
+	SSE=(\Phi \theta-Y)^T(\Phi \theta-Y) 
+\end{equation*}
+which has gradient:
+\begin{equation*}
+	\nabla SSE = 2\Phi^T(\Phi \theta-Y)
+\end{equation*}
+We tested the accuracy to this closed form solution using our central differences approximator. The analytical and numerical gradients were essentially identical across many different points, even at order $M=9$. This is exactly what we want!
+
+We then applied gradient descent to the SSE function using the analytical gradient to see if we could replicate the plots in Bishop. Optimizing our hyperparameters got increasingly difficult as we increased the order $M$. For $M=O$, we merely needed to tune the step size and we could achieve consistent convergence to the Bishop plot across many different starting values. At $M=1$, we needed to change both the step size and increase the number of maximum iterations before we consistently converged to the optimum. At $M=3$, we also had to tune the convergence threshold to be several order of magnitudes smaller than it was before, and further increase the number of max interations to get consistent convergence. Finally $M=9$, regardless of how we tried to tune the hyperparameters, we couldn't manage to find a set of hyperparameters that consistently converged, in fact, even scipy's BFGS optimizer failed to consistently produce a plot similar to Bishop's.
+
+As we expected, our naive gradient descent implementation was vastly inferior the scipy's BFGS optimizer. While we could achieve the same level of accuracy as BFGS, our implementation took significantly more iterations. Furthermore, significant time and effort is needed to properly tune our algorithm's hyperparameters, while scipy's BFGS implementation didn't require any tuning. 
+
+Alternatively, we can use a trigonometric basis expansion rather than a polynomial one and get somewhat similar results. We expect that our SSE would converge to 0 as we increased the order $M$. Also, we expect the fit to the "true" data generating function would deteriorate again with increasing order $M$. This is in fact exactly what we see: 
+
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq0T.png}
+		\caption*{$M=0$}
+	\end{minipage}
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq1T.png}
+		\caption*{$M=1$}
+	\end{minipage}
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq3T.png}
+		\caption*{$M=3$}
+	\end{minipage}
+	\begin{minipage}[b]{.24\linewidth}
+		\includegraphics[width=1\linewidth, height=2in]{Meq9T.png}
+		\caption*{$M=9$}
+	\end{minipage}
+	\caption{Plots of trigonometric basis expansions with various orders $M$, in red, fitted to the the observed points. The green curve shows the DGF $\sin(2\pi x)$.}
+\end{figure}
+
+Note that orders $M=1$ and $M=3$ provide rather good fits to for the true DGF. We should expect as the the DGF is in fact $\sin(2\pi x)$. However, if we didn't know that this was the true DGF, it might be problematic using a trigonometric basis expansion as it imposes a structure of cyclicality to the fit which may lead to gross misspecification of the model.
+
 \subsubsection*{Problem 3}
 
-To begin problem 3, we implemented the closed form solution of Ridge Regression in Python, making use of Scipy and Numpy. Note that if you want to test cases where the number of features is greater than the number of data points (something that a well-trained teacher of machine should be skeptical to do), it is useful to calculate the inverse of a matrix using the pseudo-inverse, rather than the inverse. We learned this the long way after debugging code for hours.
+To begin problem 3, we implemented the closed form solution of Ridge Regression in Python, making use of Scipy and Numpy. Note that if you want to test cases where the number of features is greater than the number of data points (something that a well-trained teacher of machine should be skeptical to do), it is useful to use the pseudo-inverse, rather than the inverse to fit your parameters. We learned this the long way after debugging code for hours.
 
 The closed form solution for ridge regression is given by the expression:
 
@@ -136,7 +228,7 @@ Given the data in Bishop 1.4 (which can be seen below), we attempt to fit polyno
 \includegraphics[scale=.3]{Bishop_14_Data.png}
 \end{center}
 
-The plot below shows the mean squared error (MSE) that our ridge regression fit gives for values of $M$ between 1 and 5, for values of $\lambda$ ranging from $10^0 -1$ to $10^2$. Note that in the case where $\lambda = 0$, we have $OLS$ regression, and as $M$ increases, the model is free to overfit our data. While the MSE here is low, if we evaluated this on a new data point, our model would likely perform very poorly. As $\lambda$ gets higher, we penalize the model for adding additional large weights to $\hat{\theta}$, but our $MSE$ stays relatively large. However, these ``large" MSE models are likely to perform better on a new data point!
+The plot below shows the mean squared error (MSE) that our ridge regression fit gives for values of $M$ between 1 and 5, for values of $\lambda$ ranging from $10^0 -1$ to $10^2$. Note that in the case where $\lambda = 0$, we have $OLS$ regression, and as $M$ increases, the model is free to overfit our data. While the MSE here is low, if we evaluated this on a new data point, our model would likely perform very poorly. As $\lambda$ gets higher, we penalize the model for adding additional large weights to $\hat{\theta}$, but our $MSE$ stays relatively large. However, these "large" MSE models are likely to perform better on a new data point!
 
 \begin{center}
 \includegraphics[scale=.4]{MSE_Lambda_Bishop.png}
@@ -164,7 +256,23 @@ This isn't surprising - the blog feedback dataset is large, with 10,480 observat
 
 
 \subsubsection*{Problem 4}
+For problem 4, we are working with a highly sparse dataset so we can compare the differences between LASSO and ridge regression. We first start by determining the optimal penalty $\lambda$ that minimizes the MSE of test set. Our optimal $\lambda$, 0.1, results in an MSE of $0.4395$. When we disable the $L_2$ regularizer, our ridge regression produces the same estimated parameters as OLS which results in a MSE of $4.0979$. Separately, we determine that $\lambda = .9$ is optimal LASSO penalty. This resulted in a MSE of $0.4524$. We plotted our 3 obtained fits - OLS, Ridge with $\lambda=0.1$, and LASSO with $\lambda=0.9$ - against the the true DGF:
 
+\begin{center}
+\includegraphics[width=4.5in]{plot4}	
+\end{center}
+
+While its seems the ridge regression seems to fit the true DGF slightly better than LASSO, both these methods vastly outperform standard OLS. We further plotted the estimated optimal weight vectors from our 3 models against the true $w$:
+
+\begin{center}
+\includegraphics[width=4.5in]{Weight_Distributions.png}	
+\end{center}
+
+We see that the L1 and L2 regularizers are working as intended! Our ridge regression estimates are considerably smaller than our OLS estimates. Furthermore, our we see sparse estimation from LASSO. This sparsity results from the differences between the L1 and L2 penalty. In ridge regression, we are want to minimize the squared error, subject to the constraint that the sum of the weights squared is less than some constant. Geometrically, we can think of this constraint as a sphere of some distance around the origin. In LASSO, we are minimizing the squared error subject to the constraint the the sum of the absolute values of the weights is less than some constant. The L1 constraint can be thought of as a diamond (or regular octahedral) around the origin.
+
+Now consider sets weights that lead to the the same squared error. These sets which can represented as ellipses with the OLS estimates at their center, as that's the point the minimizes squared error. In Ridge regression, we are looking for the point where one of these ellipses touches the sphere around the origin, while in LASSO we're looking for the ellipse that touched the diamond. Since the diamond has shaper points, its fairly likely that the ellipse intersects the diamond at one of its points, we represents some weight begin equal to 0.
 
 	
 \end{document}
+Status API Training Shop Blog About Pricing
+© 2015 GitHub, Inc. Terms Privacy Security Contact Help

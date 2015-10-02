@@ -2,10 +2,10 @@ import numpy as np
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import scipy.optimize as spo
-import pandas as pd 
+import pandas as pd
 import scipy
 import scipy.io
-import pylab
+import matplotlib.pylab as pylab
 import statsmodels.api as sm
 from ggplot import *
 
@@ -39,17 +39,17 @@ def gradientDescent(f, df, init, lr=0.3, crit=0.0001, maxIter=100000, h=0.0001, 
 		diff = Y_train - XTtheta
 		#print 'Diff manual ', diff
 		#print 'Loss function: ', f_u
-		#print 'Squared Error: ', np.sum(np.dot(np.transpose(diff), diff))*(1./Y_train.size) 
+		#print 'Squared Error: ', np.sum(np.dot(np.transpose(diff), diff))*(1./Y_train.size)
 		#print 'Penalty: ', Lambda * np.sum(np.absolute(init))
 		#print 'Loss: ', np.sum(np.dot(np.transpose(diff), diff))*(1./Y_train.size) + Lambda * np.sum(np.absolute(init))
 		#print 'Lambda: ', Lambda
 		#print 'Theta term manual', np.sum(np.absolute(init))
 		#print 'Test MSE: ', MSE(predict(init, X_test), Y_test)
 		#print 'Train MSE: ', MSE(predict(init, X_train), Y_train_val)
-		#print 'theta', init 
+		#print 'theta', init
 		#print f(init)
 		if verbose == True:
-			print init 
+			print init
 	#print "nIter: %d" % (nIter)
 	#print "Fcall: %d" % (fcall)
 	return init
@@ -71,47 +71,47 @@ def centdiff(x, f, h=0.00001):
 def ridgeRegressionLoss(theta):
 	xTtheta = np.dot(np.transpose(X_train), theta)
 	diff = Y_train - xTtheta
-	loss = np.sum(np.dot(np.transpose(diff), diff))*(1./Y_train.size) + Lambda * np.sum(np.dot(np.transpose(theta), theta))
+	loss = np.sum(np.dot(np.transpose(diff), diff))*(1./Y_train.size) + Lambda2 * np.sum(np.dot(np.transpose(theta), theta))
 
 	return loss
 
 
 def LASSOLoss(theta):
-	XTtheta = np.dot(np.transpose(X_train), theta) 
+	XTtheta = np.dot(np.transpose(X_train), theta)
 	diff = Y_train - XTtheta
 	#print 'Diff - loss', diff
 	#print 'squared error', np.sum(np.dot(np.transpose((diff)), diff))*(1./Y_train.size)
-	#print 'Lambda', Lambda 
+	#print 'Lambda', Lambda
 	#print 'Theta term', np.sum(np.absolute(theta))
 	#print 'penalty', Lambda * np.sum(np.absolute(theta))
 	#print 'theta', theta
-	loss = np.sum(np.dot(np.transpose((diff)), diff))*(1./Y_train.size) + Lambda * np.sum(np.absolute(theta))
+	loss = np.sum(np.dot(np.transpose((diff)), diff))*(1./Y_train.size) + Lambda1 * np.sum(np.absolute(theta))
 
 	return loss
 
 def predict(theta, X):
 	prediction = np.dot(np.transpose(X), theta)
 
-	return prediction 
+	return prediction
 
 def MSE(predictions, actuals):
 	mse = np.dot((np.transpose(predictions)-actuals), np.transpose(np.transpose(predictions)-actuals))/float(predictions.size)
 
-	return mse 
+	return mse
 
 def addInterceptTerm(X_array):
 	data = np.vstack([X_array, np.ones(X_array.shape[1]).reshape(1, -1)])
 
 	return data
 
-variables = scipy.io.loadmat('/Users/dholtz/Downloads/6867_hw1_data/regress-highdim.mat')
+variables = scipy.io.loadmat('/Users/mfzhao/Downloads/6867_hw1_data/regress-highdim.mat')
 X_train = variables['X_train']
 #X_train = addInterceptTerm(X_train)
 X_test = variables['X_test']
 #X_test = addInterceptTerm(X_test)
 Y_train = variables['Y_train']
 Y_train_val = Y_train
-Y_train = Y_train.reshape(-1, 1)	
+Y_train = Y_train.reshape(-1, 1)
 Y_test = variables['Y_test']
 W_true = variables['W_true']
 #W_true = np.hstack([np.array([0]).reshape(1,-1), W_true])
@@ -121,42 +121,54 @@ W_true = variables['W_true']
 thetaInit = np.repeat(.5, 12).reshape(-1, 1)
 #thetaInit = np.repeat(.25, 12).reshape(-1, 1)
 
-best_lambda = 0
-best_mse = 100
-for try_lambda in [.1, 1]:
-	Lambda = try_lambda
-	current_lambda = try_lambda
-	print 'trying', try_lambda 
-	
+best_lambda1 = 0
+best_lambda2 = 0
+best_mse1 = 100
+best_mse2 = 100
+for try_lambda in [0, .1, .2, .3, .4, .5, .6, .7 ,.8, .9, 1]:
+	Lambda1 = try_lambda
+	Lambda2 = try_lambda
+ 	current_lambda = try_lambda
+	print 'trying', try_lambda
+
 	## These don't always converge - might be because the actual function is sinusoidal?
 	print 'lasso'
-	thetaLASSO = gradientDescent(f=LASSOLoss, df=centdiff, init=thetaInit, lr=0.0003, h=.0001, crit=.0001, maxIter=1000000)
+	thetaLASSO = np.array(spo.fmin_bfgs(LASSOLoss, thetaInit, gtol=.0000001)).reshape(-1,1)
 	print 'ridge'
-	thetaRidge = gradientDescent(f=ridgeRegressionLoss, df=centdiff, init=thetaInit, lr=0.0003, h=.0001, crit=.0001, maxIter=1000000)
+	thetaRidge = np.array(spo.fmin_bfgs(ridgeRegressionLoss, thetaInit, gtol=.0000001)).reshape(-1,1)
 
+	MSERidge = MSE(predict(thetaRidge, X_test), Y_test)
+	print 'MSERidge', MSERidge
 	MSELASSO = MSE(predict(thetaLASSO, X_test), Y_test)
 	print 'MSE', MSELASSO
-	if MSELASSO < best_mse:
-		best_lambda = current_lambda
-		best_mse = MSELASSO
-		print 'best lambda is', best_lambda
 
-Lambda = best_lambda
-print Lambda
-	
+	if MSERidge < best_mse2:
+		best_lambda2 = current_lambda
+		best_mse2 = MSERidge
+		print 'best lambda is', best_lambda2
+
+	if MSELASSO < best_mse1:
+		best_lambda1 = current_lambda
+		best_mse1 = MSELASSO
+		print 'best lambda is', best_lambda1
+
+Lambda1 = best_lambda1
+Lambda2 = best_lambda2
+print Lambda1, Lambda2
+
 ## These don't always converge - might be because the actual function is sinusoidal?
 print X_train
 print Y_train
 print thetaInit
-thetaLASSO = gradientDescent(f=LASSOLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.000001, crit=.006, maxIter=1000000)
-print MSE(predict(thetaLASSO, X_test), Y_test)
-print 'theta'
-thetaRidge = gradientDescent(f=ridgeRegressionLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.000001, crit=.006, maxIter=1000000)
-print 'ridge'
+#thetaLASSO = gradientDescent(f=LASSOLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.000001, crit=.006, maxIter=1000000)
+#print MSE(predict(thetaLASSO, X_test), Y_test)
+#print 'theta'
+#thetaRidge = gradientDescent(f=ridgeRegressionLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.000001, crit=.006, maxIter=1000000)
+#print 'ridge'
 thetaLASSO = np.array(spo.fmin_bfgs(LASSOLoss, thetaInit, gtol=.0000001)).reshape(-1,1)
 thetaRidge = np.array(spo.fmin_bfgs(ridgeRegressionLoss, thetaInit, gtol=.0000001)).reshape(-1,1)
 
-	
+
 LASSOPredictions = predict(thetaLASSO, X_test)
 print 'predicted lasso test'
 ridgePredictions = predict(thetaRidge, X_test)
@@ -177,7 +189,7 @@ YRidge_lin = predict(thetaRidge, X_lin)
 #thetaBFGS = spo.fmin_bfgs(LASSOLoss, thetaInit, gtol=.0000001)
 #print thetaBFGS
 
-Lambda = 0
+Lambda1 = 0
 
 thetaOLS = gradientDescent(f=LASSOLoss, df=centdiff, init=thetaInit, lr=0.00003, h=.00001, crit=.006, maxIter=1000000)
 #thetaOLS = np.array(thetaBFGS).reshape(-1,1)
@@ -221,8 +233,8 @@ plt.title('Predicted f(x) for various models')
 plt.legend(loc=1)
 pylab.show()
 
-#print thetaOLS 
-#print thetaRidge 
+#print thetaOLS
+#print thetaRidge
 #print thetaLASSO
 #print W_true
 
