@@ -105,7 +105,7 @@ print '======Plot Training======'
 plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'SVM Train')
 
 
-print '======Validation======'
+print '======Validation======='
 # load data from csv files
 validate = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_validate.csv')
 X = validate[:, 0:2]
