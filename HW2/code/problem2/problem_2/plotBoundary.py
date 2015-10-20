@@ -18,7 +18,6 @@ def plotDecisionBoundary(X, Y, scoreFn, values, title = ""):
     X_tmp = array([[x1, x2] for x1, x2 in zip(ravel(xx), ravel(yy))])
     zz = array([scoreFn(X_tmp)])
     zz = zz.reshape(xx.shape)
-    print xx, yy, zz
     pl.figure()
     CS = pl.contour(xx, yy, zz, values, colors = 'green', linestyles = 'solid', linewidths = 2)
     pl.clabel(CS, fontsize=9, inline=1)

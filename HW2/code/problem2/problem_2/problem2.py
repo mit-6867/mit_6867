@@ -1,10 +1,11 @@
 import numpy as np
 from plotBoundary import *
 import cvxopt
+import sys
 # import your SVM training code
 
 # parameters
-name = 'nonsep'
+name = 'stdev4'
 print '======Training======'
 # load data from csv files
 train = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_train.csv')
@@ -22,7 +23,7 @@ def gaussian_kernel(x, y, sigma=1):
     return np.exp(-linalg.norm(x-y)**2 / (2 * (sigma ** 2)))
 
 #X = np.array([[1., 2.], [2., 2.], [0., 0.], [-2., 3.]])
-#y = np.array([1., 1., -1., -1.])
+#Y = np.array([1., 1., -1., -1.])
 C = 1
 kernel = linear_kernel
 
@@ -83,7 +84,6 @@ def predictSVM(X):
 		weight = None
 
 	if weight != None:
-		print [X, np.sign(np.dot(X, weight) + theta_0)]
 		return np.sign(np.dot(X, weight) + theta_0)
 
 	else:
@@ -101,7 +101,11 @@ def predictSVM(X):
 
 # plot training results
 print '======Plot Training======'
-plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'SVM Train')
+plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Training')
+y_predict = predictSVM(X)
+y_predict = np.reshape(y_predict, (len(y_predict), -1))
+correct = float(np.sum(Y == y_predict))/len(Y)
+print correct
 
 
 print '======Validation=======	'
@@ -110,5 +114,9 @@ validate = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_val
 X = validate[:, 0:2]
 Y = validate[:, 2:3]
 # plot validation results
-plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'SVM Validate')
+plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Validation')
+y_predict = predictSVM(X)
+y_predict = np.reshape(y_predict, (len(y_predict), -1))
+correct = float(np.sum(Y == y_predict))/len(Y)
+print correct
 
