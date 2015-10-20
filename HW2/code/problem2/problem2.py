@@ -5,7 +5,7 @@ import sys
 # import your SVM training code
 
 # parameters
-name = 'stdev4'
+name = 'nonsep'
 print '======Training======'
 # load data from csv files
 train = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_train.csv')
@@ -98,6 +98,32 @@ def predictSVM(X):
 				s += a_0*sv_y_0*kernel(X[i], sv_0)
 			y_predict[i] = s
 		return np.sign(y_predict + theta_0)
+
+def geometricMarginSVM():
+	global alpha 
+	global sv 
+	global sv_y
+	global sv_bool 
+	global ind 
+	global K
+	global n_features
+
+	theta_0 = 0
+	for n in range(len(alpha)):
+		theta_0 += sv_y[n]
+		theta_0 -= np.sum(alpha * sv_y * K[ind[n],sv_bool])
+		theta_0 /= len(alpha)
+
+	weight = np.zeros(n_features)
+	for n in range(len(alpha)):
+		weight += alpha[n] + sv_y[n] + sv[n]
+
+	weights = np.append(weight, theta_0)
+	#print np.linalg.norm(weights)
+	return 1./np.linalg.norm(weights)
+
+
+print 'geometric margin', geometricMarginSVM()
 
 # plot training results
 print '======Plot Training======'
