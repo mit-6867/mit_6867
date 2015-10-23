@@ -2,6 +2,7 @@ import numpy as np
 from plotBoundary import *
 import cvxopt
 import sys
+from cvxopt import matrix
 # import your SVM training code
 
 # parameters
@@ -12,8 +13,11 @@ try:
     train = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_train.csv')
 except:
     train = loadtxt('/Users/mfzhao/Downloads/hw2_resources/data/data_'+name+'_train.csv')
-    
-# use deep copy here to make cvxopt happy
+import numpy as np
+from plotBoundary import *
+import cvxopt
+import sys
+# import your SVM training code
 X = train[:, 0:2].copy()
 Y = train[:, 2:3].copy()
 
@@ -23,13 +27,15 @@ def linear_kernel(x1, x2):
 def polynomial_kernel(x, y, p=3):
     return (1 + np.dot(x, y)) ** p
 
-def gaussian_kernel(x, y, sigma=1):
+sigma =  1
+def gaussian_kernel(x, y):
+    global sigma
     return np.exp(-linalg.norm(x-y)**2 / (2 * (sigma ** 2)))
 
 #X = np.array([[1., 2.], [2., 2.], [0., 0.], [-2., 3.]])
 #Y = np.array([1., 1., -1., -1.])
 C = 1
-kernel = linear_kernel
+kernel = gaussian_kernel
 
 
 # Carry out training, primal and/or dual
@@ -61,7 +67,7 @@ def trainSVM(X, y, kernel, C):
 
 	return n_features, K, alpha, sv, sv_y, sv_bool, ind
 
-n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=C)
+#n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=C)
 
 # Define the predictSVM(x) function, which uses trained parameters
 def predictSVM(X):
@@ -79,7 +85,7 @@ def predictSVM(X):
 		theta_0 -= np.sum(alpha * sv_y * K[ind[n],sv_bool])
 		theta_0 /= len(alpha)
 
-	# Weight vector
+		# Weight vector
 	if kernel == linear_kernel:
 		weight = np.zeros(n_features)
 		for n in range(len(alpha)):
@@ -126,3 +132,26 @@ def geometricMarginSVM():
 	#print np.linalg.norm(weights)
 	return 1./np.linalg.norm(weights)
 
+
+#print 'geometric margin', geometricMarginSVM()
+
+# plot training results
+#print '======Plot Training======'
+#plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Training')
+#y_predict = predictSVM(X)
+#y_predict = np.reshape(y_predict, (len(y_predict), -1))
+#correct = float(np.sum(Y == y_predict))/len(Y)
+#print correct
+#
+#
+#print '======Validation=======	'
+## load data from csv files
+#validate = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_validate.csv')
+#X = validate[:, 0:2]
+#Y = validate[:, 2:3]
+## plot validation results
+#plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Validation')
+#y_predict = predictSVM(X)
+#y_predict = np.reshape(y_predict, (len(y_predict), -1))
+#correct = float(np.sum(Y == y_predict))/len(Y)
+#print correct

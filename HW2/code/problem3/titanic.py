@@ -1,5 +1,4 @@
 from numpy import *
-from plotBoundary import *
 import scipy.optimize
 import matplotlib as mpl
 from ggplot import *
@@ -10,8 +9,7 @@ from cvxopt import matrix
 from problem2 import *
 
 def scaling(X):
-    list = (4,5,6,7)
-    for i in list:
+    for i in (4,5,6,7):
         xmax = max(X[:,i])
         xmin = min(X[:,i])
         X[:,i] =  (X[:,i] - xmin)/(xmax - xmin)
@@ -26,8 +24,8 @@ def LRPredict(w, X):
     
 # Training Function
 def Train(X, Y, l=0):
-    w0 = random.randn(12)
-    w_opt = scipy.optimize.fmin(LRLoss, w0, args=(X,Y,l))
+    w0 = random.randn(13)
+    w_opt = scipy.optimize.fmin_bfgs(LRLoss, w0, args=(X,Y,l))
     return w_opt
 
 # Classification Error Function
@@ -45,15 +43,18 @@ def loadTitan(name, typ):
         data = scipy.io.loadmat('/Users/dholtz/Downloads/hw2_resources/data/'+file)['data']
     except:
         data = scipy.io.loadmat('/Users/mfzhao/Downloads/hw2_resources/data/'+file)['data']
-    X = data[:,0:11]
+    temp = data[:,0:11]
+    scaling(temp)
     Y = data[:,11:12]
-    return array(X), array(Y)
+    X = ones([len(temp), 12])
+    X[:,1:12] = temp
+    return X.copy(), Y.copy()
 
 def GridLR(Xt, Yt, Xv, Yv, l, db=0.5):
     l_opt = 0
     bestLoss = 10000
-    w0 = random.randn(12)
-    w_opt = zeros(12)
+    w0 = random.randn(13)
+    w_opt = zeros(13)
     vErr = []
     for i in range(len(l)):
         w = scipy.optimize.fmin_bfgs(LRLoss, w0, args=(Xt,Yt,l[i]))
@@ -86,22 +87,12 @@ def SVMGrid(Xtr, Ytr, Xv, Yv):
 Xtr, Ytr= loadTitan('titanic', 'train')
 Xv, Yv= loadTitan('titanic', 'validate')
 Xtest, Ytest = loadTitan('titanic', 'test')
-scaling(Xtr)
-scaling(Xv)
-scaling(Xtest)
 
-XtrC = Xtr.copy()
-XvC = Xv.copy()
-XtestC = Xtest.copy()
-YtrC = Ytr.copy()
-YvC = Yv.copy()
-YtestC = Ytest.copy()
-
-lamb = linspace(0,1,101)
-w,l = GridLR(XtrC, YtrC, Xv, Yv, lamb)
+lamb = linspace(.3,.4,11)
+w,l = GridLR(Xtr, Ytr, Xv, Yv, lamb)
 CE_LRtr = classifyErr(w, Xtr, Ytr, 0.5)
 CE_LRv = classifyErr(w, Xv, Yv, 0.5)
-CE_LRtest =classifyErr(w, Xtest, Ytest, 0.5)
+CE_LRtest = classifyErr(w, Xtest, Ytest, 0.5)
 
 print '=========================LR========================='
 print 'Optimal w: ', w
@@ -112,8 +103,8 @@ print 'LR Validation Classification Error: ',CE_LRtr
 print 'LR Test Classification Error: ',CE_LRtr
 print '===================================================='
 kernel = gaussian_kernel
-n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(XtrC, YtrC, kernel, 1)
-#n_features, K, alpha, sv, sv_y, sv_bool, ind = SVMGrid(XtrC, YtrC, XvC, YvC)
+#n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(Xtr, Ytr, kernel, 1)
+n_features, K, alpha, sv, sv_y, sv_bool, ind = SVMGrid(Xtr, Ytr, Xv, Yv)
 yhattr = predictSVM(XtrC)
 yhatv = predictSVM(XvC)
 yhattest = predictSVM(XtestC)
@@ -122,8 +113,8 @@ CE_SVMv = SVMErr(yhatc, YtrC)
 CE_SVMtest = SVMErr(yhattest, YtrC)
 
 w_SVM = np.zeros(n_features)
-	for n in range(len(alpha)):
-		w_SVM += alpha[n] * sv_y[n] * sv[n]
+for n in range(len(alpha)):
+    w_SVM += alpha[n] * sv_y[n] * sv[n]
 
 print '=========================SVM========================='
 print 'optimal w:', w_SVM
@@ -132,5 +123,9 @@ print 'SVM Training Classification Error: ',CE_LRtr
 print 'SVM Validation Classification Error: ',CE_LRtr
 print 'SVM Test Classification Error: ',CE_LRtr
 
-print 'geometric margin':, geometricMarginSVM()
+print 'geometric margin: ', geometricMarginSVM()
 print '====================================================='
+
+
+
+
