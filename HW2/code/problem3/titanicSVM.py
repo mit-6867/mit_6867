@@ -21,8 +21,7 @@ def loadTitan(name, typ):
     X = np.array(data[:,0:11]).copy()
     scaling(X)
     Y = np.array(data[:,11:12]).copy()
-    print X.shape 
-    print Y.shape
+    Y = matrix(Y.tolist())
     return X, Y
 
 def linear_kernel(x1, x2):
@@ -56,9 +55,10 @@ def trainSVM(X, y, kernel, C):
 	alpha = np.ravel(solution['x'])
 
 	sv_bool = alpha > .00001
+	sv_bool = np.array(sv_bool)
 	ind = np.arange(len(alpha))[sv_bool]
 	alpha = alpha[sv_bool]
-	sv_y = y[sv_bool]
+	sv_y = np.ravel(y)[sv_bool]
 	sv = X[sv_bool]
 	print "%d support vectors out of %d points" % (len(alpha), n_samples)
 
@@ -72,24 +72,20 @@ def predictSVM(X):
 	global ind 
 	global K
 	global n_features
-
+	global kernel
+	
 	theta_0 = 0
 	for n in range(len(alpha)):
 		theta_0 += sv_y[n]
 		theta_0 -= np.sum(alpha * sv_y * K[ind[n],sv_bool])
 		theta_0 /= len(alpha)
 
-		# Weight vector
+	# Weight vector
 	if kernel == linear_kernel:
 		weight = np.zeros(n_features)
 		for n in range(len(alpha)):
 			weight += alpha[n] * sv_y[n] * sv[n]
-	else:
-		weight = None
-
-	if weight != None:
 		return np.sign(np.dot(X, weight) + theta_0)
-
 	else:
 		if len(np.array(X).shape) == 1:
 			n_points = 1 
@@ -137,35 +133,79 @@ def SVMGrid(Xtr, Ytr, Xv, Yv):
     global ind 
     global K
     global n_features
-    print 'SVMGrid'
-    C = linspace(0,100,101)
-    bestErr = 1
-    kernel = gaussian_kernel
+    global kernel
+    global sigma
+
+    C = linspace(0,1,101)
+    bestErr = 10
     bestC = 0
-    for i in range(len(C)):
-        n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(Xtr, Ytr, kernel, C=C[i])
-        yhat = predictSVM(Xv)
-        cErr = SVMErr(yhat, Yv)
-        if cErr < bestErr:
-            bestErr = cErr
-            bestC = C[i]
-            n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb = n_features, K, alpha, sv, sv_y, sv_bool, ind
-    return n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb, bestC
+    if kernel == gaussian_kernel:
+        sigb = 0
+        sig = linspace(0.05,2,40)
+        for val in sig:
+            print val
+            sigma = val
+            for i in range(len(C)):
+                n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(Xtr, Ytr, kernel, C=C[i])
+                yhat = predictSVM(Xv)
+                cErr = SVMErr(yhat, Yv)
+                print cErr
+                if cErr < bestErr:
+                    bestErr = cErr
+                    bestC = C[i]
+                    sigb = sigma
+                    n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb = n_features, K, alpha, sv, sv_y, sv_bool, ind
+        return n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb, bestC, sigb
+     
+    else:   
+        for i in range(len(C)):
+            n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(Xtr, Ytr, kernel, C=C[i])
+            yhat = predictSVM(Xv)
+            cErr = SVMErr(yhat, Yv)
+            print cErr
+            if cErr < bestErr:
+                bestErr = cErr
+                bestC = C[i]
+                n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb = n_features, K, alpha, sv, sv_y, sv_bool, ind
+        return n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb, bestC
     
 Xtr, Ytr= loadTitan('titanic', 'train')
 Xv, Yv= loadTitan('titanic', 'validate')
 Xtest, Ytest = loadTitan('titanic', 'test')
 
-sigma = 1
-kernel = gaussian_kernel
-#n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(Xtr, Ytr, kernel, 1)
-n_features, K, alpha, sv, sv_y, sv_bool, ind = SVMGrid(Xtr, Ytr, Xv, Yv)
-yhattr = predictSVM(XtrC)
-yhatv = predictSVM(XvC)
-yhattest = predictSVM(XtestC)
-CE_SVMtr = SVMErr(yhattr, YtrC)
-CE_SVMv = SVMErr(yhatc, YtrC)
-CE_SVMtest = SVMErr(yhattest, YtrC)
+
+#kernel = linear_kernel
+#n_features, K, alpha, sv, sv_y, sv_bool, ind, C = SVMGrid(Xtr, Ytr, Xv, Yv)
+#yhattr = predictSVM(Xtr)
+#yhatv = predictSVM(Xv)
+#yhattest = predictSVM(Xtest)
+#CE_SVMtr = SVMErr(yhattr, Ytr)
+#CE_SVMv = SVMErr(yhatv, Yv)
+#CE_SVMtest = SVMErr(yhattest, Ytest)
+
+#w_SVM = np.zeros(n_features)
+#for n in range(len(alpha)):
+#    w_SVM += alpha[n] * sv_y[n] * sv[n]
+
+#print '=========================SVM========================='
+#print 'optimal w:', w_SVM
+#print 'optimal C:', C
+
+#print 'SVM Training Classification Error:   ',CE_SVMtr
+#print 'SVM Validation Classification Error: ',CE_SVMv
+#print 'SVM Test Classification Error:       ',CE_SVMtest
+
+#print 'geometric margin: ', geometricMarginSVM()
+#print '====================================================='
+
+kernel = polynomial_kernel
+n_features, K, alpha, sv, sv_y, sv_bool, ind, C = SVMGrid(Xtr, Ytr, Xv, Yv)
+yhattr = predictSVM(Xtr)
+yhatv = predictSVM(Xv)
+yhattest = predictSVM(Xtest)
+CE_SVMtr = SVMErr(yhattr, Ytr)
+CE_SVMv = SVMErr(yhatv, Yv)
+CE_SVMtest = SVMErr(yhattest, Ytest)
 
 w_SVM = np.zeros(n_features)
 for n in range(len(alpha)):
@@ -173,10 +213,36 @@ for n in range(len(alpha)):
 
 print '=========================SVM========================='
 print 'optimal w:', w_SVM
+print 'optimal C:', C
 
-print 'SVM Training Classification Error: ',CE_LRtr
-print 'SVM Validation Classification Error: ',CE_LRtr
-print 'SVM Test Classification Error: ',CE_LRtr
+print 'SVM Training Classification Error:   ',CE_SVMtr
+print 'SVM Validation Classification Error: ',CE_SVMv
+print 'SVM Test Classification Error:       ',CE_SVMtest
 
 print 'geometric margin: ', geometricMarginSVM()
 print '====================================================='
+
+#kernel = gaussian_kernel
+#n_features, K, alpha, sv, sv_y, sv_bool, ind, C, sig = SVMGrid(Xtr, Ytr, Xv, Yv)
+#yhattr = predictSVM(Xtr)
+#yhatv = predictSVM(Xv)
+#yhattest = predictSVM(Xtest)
+#CE_SVMtr = SVMErr(yhattr, Ytr)
+#CE_SVMv = SVMErr(yhatv, Yv)
+#CE_SVMtest = SVMErr(yhattest, Ytest)
+
+#w_SVM = np.zeros(n_features)
+#for n in range(len(alpha)):
+#    w_SVM += alpha[n] * sv_y[n] * sv[n]
+
+#print '=========================SVM========================='
+#print 'optimal w:', w_SVM
+#print 'optimal C:', C
+#print 'optimal sigma:', sig
+
+#print 'SVM Training Classification Error:   ',CE_SVMtr
+#print 'SVM Validation Classification Error: ',CE_SVMv
+#print 'SVM Test Classification Error:       ',CE_SVMtest
+
+#print 'geometric margin: ', geometricMarginSVM()
+#print '====================================================='

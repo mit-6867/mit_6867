@@ -48,8 +48,8 @@ def loadTitan(name, typ):
 def GridLR(Xt, Yt, Xv, Yv, l, db=0.5):
     l_opt = 0
     bestLoss = 10000
-    w0 = random.randn(13)
-    w_opt = zeros(13)
+    w0 = random.randn(12)
+    w_opt = zeros(12)
     vErr = []
     for i in range(len(l)):
         w = scipy.optimize.fmin_bfgs(LRLoss, w0, args=(Xt,Yt,l[i]))
@@ -79,10 +79,6 @@ print 'Optimal w: ', w
 print 'Optimal lambda', l
 
 print 'LR Training Classification Error: ',CE_LRtr
-print 'LR Validation Classification Error: ',CE_LRtr
-print 'LR Test Classification Error: ',CE_LRtr
+print 'LR Validation Classification Error: ',CE_LRv
+print 'LR Test Classification Error: ',CE_LRtest
 print '===================================================='
-
-
-
-

@@ -30,7 +30,7 @@ feature_weights %>%
   ggplot(., aes(x=as.factor(`Feature Name`), y=`Feature Weight (Normalized)`, fill=`Model`)) + 
   geom_bar(stat="identity", position="dodge") + xlab('Feature') + 
   ggtitle('Feature Weights (Normalized by Model)') + theme(axis.text.x = element_text(angle = 90, hjust = 1)) -> p
-ggsave(p, file='~/Desktop/mit_6867/HW2/tex/titanic_weight_comparison.png')
+ggsave(p, file='~/Desktop/mit_6867/HW2/tex/titanic_weight_comparison.png', height=10, width=20, units='in')
 
 feature_weights %>%
   group_by(`Model`) %>%
