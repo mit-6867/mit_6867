@@ -233,14 +233,14 @@ C \\
 
 \begin{table}
 \captionof{table}{Performance of Linear SVM on provided data sets}
-\begin{tabular}{llllll}
+\begin{tabular}{c c|c|c|c|c|c}
 \toprule
-{} & dataset & classification error rate (training set) & classification error rate (validation set) \\
+{} & dataset & $w_0$ & $w_1$ & $w_2$ & classification error rate (training) & classification error rate (validation) \\
 \midrule
-  & data\_stdev1 & 0.00\% & 0.00\% \\
-  & data\_stdev2 & 9.50\% & 7.50\% \\
-  & data\_stdev4 & 26.00\% & 23.50\% \\
-  & data\_nonsep & 49.50\% & 51.25\% \\
+  & data\_stdev1 & 0.31 & 5.42 & 0.87 & 0.00\% & 0.00\% \\
+  & data\_stdev2 & 9.09e-2 & 9.83e1 & 9.11e1 & 9.50\% & 7.50\% \\
+  & data\_stdev4 & -2.05e-2 & 2.58e2 & 2.40e2 & 26.00\% & 23.50\% \\
+  & data\_nonsep & 2.56e-3 & 4.23e2 & 3.84e2 & 49.50\% & 51.25\% \\
 \bottomrule
 \end{tabular}
 \end{table}

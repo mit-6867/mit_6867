@@ -5,7 +5,7 @@ import sys
 # import your SVM training code
 
 # parameters
-name = 'nonsep'
+name = 'stdev1'
 print '======Training======'
 # load data from csv files
 try:
@@ -29,13 +29,11 @@ def gaussian_kernel(x, y):
 #X = np.array([[1., 2.], [2., 2.], [0., 0.], [-2., 3.]])
 #Y = np.array([1., 1., -1., -1.])
 C = 1
-kernel = gaussian_kernel
+kernel = linear_kernel
 
 
 # Carry out training, primal and/or dual
 def trainSVM(X, y, kernel, C):
-	print y.shape 
-	print X.shape
 	n_samples, n_features = X.shape
 	K = np.zeros((n_samples, n_samples))
 	for i in range(n_samples):
@@ -44,11 +42,6 @@ def trainSVM(X, y, kernel, C):
 
 	P = cvxopt.matrix(np.outer(y,y) * K)
 	q = cvxopt.matrix(np.ones(n_samples) * -1.)
-	print y.shape 
-	print y.dtype
-	print (1, n_samples)
-	print y
-	print 
 	A = cvxopt.matrix(np.array(y), (1, n_samples))
 	b = cvxopt.matrix(0.0)
 
@@ -68,7 +61,7 @@ def trainSVM(X, y, kernel, C):
 
 	return n_features, K, alpha, sv, sv_y, sv_bool, ind
 
-#n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=C)
+n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=C)
 
 # Define the predictSVM(x) function, which uses trained parameters
 def predictSVM(X):
@@ -133,38 +126,70 @@ def geometricMarginSVM():
 	#print np.linalg.norm(weights)
 	return 1./np.linalg.norm(weights)
 
+def weightsSVM():
+	global alpha 
+	global sv 
+	global sv_y
+	global sv_bool 
+	global ind 
+	global K
+	global n_features
+
+	theta_0 = 0
+	for n in range(len(alpha)):
+		theta_0 += sv_y[n]
+		theta_0 -= np.sum(alpha * sv_y * K[ind[n],sv_bool])
+		theta_0 /= len(alpha)
+
+	weight = np.zeros(n_features)
+	for n in range(len(alpha)):
+		weight += alpha[n] + sv_y[n] + sv[n]
+
+	weights = np.append(weight, theta_0)
+	#print np.linalg.norm(weights)
+	return weights
+
+
+def SVMErr(yhat, y):
+    return 1 - mean((yhat == y))
 
 #print 'geometric margin', geometricMarginSVM()
 
-# plot training results
-#print '======Plot Training======'
-#plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Training')
-#y_predict = predictSVM(X)
-#y_predict = np.reshape(y_predict, (len(y_predict), -1))
-#correct = float(np.sum(Y == y_predict))/len(Y)
-#print correct
-#
-#
-#print '======Validation=======	'
-## load data from csv files
-#validate = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_validate.csv')
-#X = validate[:, 0:2]
-#Y = validate[:, 2:3]
-## plot validation results
-#plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Validation')
-#y_predict = predictSVM(X)
-#y_predict = np.reshape(y_predict, (len(y_predict), -1))
-#correct = float(np.sum(Y == y_predict))/len(Y)
-#print correct
+print '======Plot Training======'
+plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Training')
+y_predict = predictSVM(X)
+y_predict = np.reshape(y_predict, (len(y_predict), -1))
+correct = float(np.sum(Y == y_predict))/len(Y)
+classification_error_rate = SVMErr(y_predict, Y)
+print classification_error_rate
+print correct
+print weightsSVM()
 
-for i in (.01, .1, 1, 10, 100):
-	#for sig in (.01, .1, 1, 10, 100):
-	for sig in ([1.]):
-		print 'C = ', i 
-		print 'sigma = ', sig 
-		sigma = sig
-		kernel = linear_kernel
-		C = i 
-		n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=i)
-		print 'geometric margin', geometricMarginSVM()
-		print 'geometric margin', geometricMarginSVM()
+
+print '======Validation=======	'
+# load data from csv files
+validate = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_validate.csv')
+X = validate[:, 0:2]
+Y = validate[:, 2:3]
+# plot validation results
+plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Validation')
+y_predict = predictSVM(X)
+y_predict = np.reshape(y_predict, (len(y_predict), -1))
+correct = float(np.sum(Y == y_predict))/len(Y)
+classification_error_rate = SVMErr(y_predict, Y)
+print classification_error_rate
+print correct
+print weightsSVM()
+
+#for i in (.01, .1, 1, 10, 100):
+#	#for sig in (.01, .1, 1, 10, 100):
+#	for sig in ([1.]):
+#		print 'C = ', i 
+#		print 'sigma = ', sig 
+#		sigma = sig
+#		kernel = linear_kernel
+#		C = i 
+#		n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=i)
+#		print 'geometric margin', geometricMarginSVM()
+#		print 'geometric margin', geometricMarginSVM()
+#
