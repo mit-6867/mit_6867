@@ -5,10 +5,6 @@ import matplotlib as mpl
 from ggplot import *
 import pandas as pd
 
-# Plotting Params
-mpl.rcParams["figure.figsize"] = "2.25, 2"
-pltsize = {"figure.figsize": "2.25, 2"}
-
 # Logistic Regression Loss Function
 def LRLoss(w, X, Y, l=0):
     return sum(log(1+exp(-hstack(Y)*(dot(X,w[1:len(w)])+w[0]))))+l*dot(w[1:len(w)], w[1:len(w)])
@@ -21,7 +17,7 @@ def LRPredict(w, X):
 def loadData(name, typ):
     try:
         data = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_'+typ+'.csv')
-    try:
+    except:
         data = loadtxt('/Users/mfzhao/Downloads/hw2_resources/data/data_'+name+'_'+typ+'.csv')
     X = data[:,0:2]
     Y = data[:,2:3]
@@ -69,7 +65,6 @@ def GridL(Xt, Yt, Xv, Yv, l, db=0.5):
 
 # Wrapper to do everything necessary for each dataset
 def wrapper(name):
-    global pltsize
     Xt, Yt=loadData(name, 'train')
     Xv, Yv=loadData(name, 'validate')
     w = Train(Xt, Yt, 0)
@@ -91,10 +86,22 @@ def wrapper(name):
     DF2 = pd.melt(DF2,id_vars=['Lambda'])
     title1 = 'Classification Error vs Lambda - ' + name
     title2 = 'Logisitic Loss vs Lambda - ' + name
-    print p1 = ggplot(DF1, aes(x='Lambda', y='value', color='variable')) + geom_line(size=4) + ggtitle('') + ylab('Error') + theme_matplotlib(rc=pltsize, matplotlib_defaults=False)
-    print p2 = ggplot(DF2, aes(x='Lambda', y='value', color='variable')) + geom_line(size=4) + ggtitle('') + ylab('Error') + theme_matplotlib(rc=pltsize, matplotlib_defaults=False)
-    
-wrapper('stdev1')
-wrapper('stdev2')
-wrapper('stdev4')
-wrapper('nonsep')
+    #print p1 = ggplot(DF1, aes(x='Lambda', y='value', color='variable')) + geom_line(size=4) + ggtitle('') + ylab('Error')
+    #print p2 = ggplot(DF2, aes(x='Lambda', y='value', color='variable')) + geom_line(size=4) + ggtitle('') + ylab('Error')
+
+def wrapper2(name):
+    global pltsize
+    Xt, Yt=loadData(name, 'train')
+    Xv, Yv=loadData(name, 'validate')
+    w = Train(Xt, Yt, 0)
+    return w
+
+w1 = wrapper2('stdev1')
+w2 = wrapper2('stdev2')
+w3 = wrapper2('stdev4')
+w4 = wrapper2('nonsep')
+
+DF = pd.DataFrame({'stdev1': pd.Series(w1), 'stdev4': pd.Series(w1), 'stdev2': pd.Series(w1), 'nonsep': pd.Series(w4)})
+DF.to_latex()
+
+
