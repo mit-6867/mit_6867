@@ -2,19 +2,28 @@ import numpy as np
 from plotBoundary import *
 import cvxopt
 import sys
-# import your SVM training code
+from cvxopt import matrix
+import scipy.io
 
-# parameters
-name = 'nonsep'
-print '======Training======'
-# load data from csv files
-try:
-    train = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_train.csv')
-except:
-    train = loadtxt('/Users/mfzhao/Downloads/hw2_resources/data/data_'+name+'_train.csv')
-# use deep copy here to make cvxopt happy
-X = train[:, 0:2].copy()
-Y = train[:, 2:3].copy()
+def scaling(X):
+    for i in range(11):
+        xmax = max(X[:,i])
+        xmin = min(X[:,i])
+        X[:,i] =  (X[:,i] - xmin)/(xmax - xmin)
+
+def loadTitan(name, typ):
+    file = 'data_'+name+'_'+typ+'.csv'
+    try:
+        data = scipy.io.loadmat('/Users/dholtz/Downloads/hw2_resources/data/'+file)['data']
+    except:
+        data = scipy.io.loadmat('/Users/mfzhao/Downloads/hw2_resources/data/'+file)['data']
+    print data.shape
+    X = np.array(data[:,0:11]).copy()
+    scaling(X)
+    Y = np.array(data[:,11:12]).copy()
+    print X.shape 
+    print Y.shape
+    return X, Y
 
 def linear_kernel(x1, x2):
     return np.dot(x1, x2)
@@ -26,16 +35,8 @@ def gaussian_kernel(x, y):
     global sigma
     return np.exp(-linalg.norm(x-y)**2 / (2 * (sigma ** 2)))
 
-#X = np.array([[1., 2.], [2., 2.], [0., 0.], [-2., 3.]])
-#Y = np.array([1., 1., -1., -1.])
-C = 1
-kernel = gaussian_kernel
-
-
 # Carry out training, primal and/or dual
 def trainSVM(X, y, kernel, C):
-	print y.shape 
-	print X.shape
 	n_samples, n_features = X.shape
 	K = np.zeros((n_samples, n_samples))
 	for i in range(n_samples):
@@ -44,12 +45,7 @@ def trainSVM(X, y, kernel, C):
 
 	P = cvxopt.matrix(np.outer(y,y) * K)
 	q = cvxopt.matrix(np.ones(n_samples) * -1.)
-	print y.shape 
-	print y.dtype
-	print (1, n_samples)
-	print y
-	print 
-	A = cvxopt.matrix(np.array(y), (1, n_samples))
+ 	A = cvxopt.matrix(y.astype(float), (1, n_samples))
 	b = cvxopt.matrix(0.0)
 
 	G = cvxopt.matrix(np.vstack([np.diag(np.ones(n_samples) * -1.), np.diag(np.ones(n_samples))]))
@@ -68,9 +64,6 @@ def trainSVM(X, y, kernel, C):
 
 	return n_features, K, alpha, sv, sv_y, sv_bool, ind
 
-#n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=C)
-
-# Define the predictSVM(x) function, which uses trained parameters
 def predictSVM(X):
 	global alpha 
 	global sv 
@@ -133,38 +126,57 @@ def geometricMarginSVM():
 	#print np.linalg.norm(weights)
 	return 1./np.linalg.norm(weights)
 
+def SVMErr(yhat, y):
+    return 1 - mean((yhat == y))
 
-#print 'geometric margin', geometricMarginSVM()
+def SVMGrid(Xtr, Ytr, Xv, Yv):
+    global alpha 
+    global sv 
+    global sv_y
+    global sv_bool 
+    global ind 
+    global K
+    global n_features
+    print 'SVMGrid'
+    C = linspace(0,100,101)
+    bestErr = 1
+    kernel = gaussian_kernel
+    bestC = 0
+    for i in range(len(C)):
+        n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(Xtr, Ytr, kernel, C=C[i])
+        yhat = predictSVM(Xv)
+        cErr = SVMErr(yhat, Yv)
+        if cErr < bestErr:
+            bestErr = cErr
+            bestC = C[i]
+            n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb = n_features, K, alpha, sv, sv_y, sv_bool, ind
+    return n_featuresb, Kb, alphab, svb, sv_yb, sv_boolb, indb, bestC
+    
+Xtr, Ytr= loadTitan('titanic', 'train')
+Xv, Yv= loadTitan('titanic', 'validate')
+Xtest, Ytest = loadTitan('titanic', 'test')
 
-# plot training results
-#print '======Plot Training======'
-#plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Training')
-#y_predict = predictSVM(X)
-#y_predict = np.reshape(y_predict, (len(y_predict), -1))
-#correct = float(np.sum(Y == y_predict))/len(Y)
-#print correct
-#
-#
-#print '======Validation=======	'
-## load data from csv files
-#validate = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_validate.csv')
-#X = validate[:, 0:2]
-#Y = validate[:, 2:3]
-## plot validation results
-#plotDecisionBoundary(X, Y, predictSVM, [-1, 0, 1], title = 'Linear SVM, stdev4 Validation')
-#y_predict = predictSVM(X)
-#y_predict = np.reshape(y_predict, (len(y_predict), -1))
-#correct = float(np.sum(Y == y_predict))/len(Y)
-#print correct
+sigma = 1
+kernel = gaussian_kernel
+#n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(Xtr, Ytr, kernel, 1)
+n_features, K, alpha, sv, sv_y, sv_bool, ind = SVMGrid(Xtr, Ytr, Xv, Yv)
+yhattr = predictSVM(XtrC)
+yhatv = predictSVM(XvC)
+yhattest = predictSVM(XtestC)
+CE_SVMtr = SVMErr(yhattr, YtrC)
+CE_SVMv = SVMErr(yhatc, YtrC)
+CE_SVMtest = SVMErr(yhattest, YtrC)
 
-for i in (.01, .1, 1, 10, 100):
-	#for sig in (.01, .1, 1, 10, 100):
-	for sig in ([1.]):
-		print 'C = ', i 
-		print 'sigma = ', sig 
-		sigma = sig
-		kernel = linear_kernel
-		C = i 
-		n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=i)
-		print 'geometric margin', geometricMarginSVM()
-		print 'geometric margin', geometricMarginSVM()
+w_SVM = np.zeros(n_features)
+for n in range(len(alpha)):
+    w_SVM += alpha[n] * sv_y[n] * sv[n]
+
+print '=========================SVM========================='
+print 'optimal w:', w_SVM
+
+print 'SVM Training Classification Error: ',CE_LRtr
+print 'SVM Validation Classification Error: ',CE_LRtr
+print 'SVM Test Classification Error: ',CE_LRtr
+
+print 'geometric margin: ', geometricMarginSVM()
+print '====================================================='

@@ -2,6 +2,7 @@ import numpy as np
 from plotBoundary import *
 import cvxopt
 import sys
+from cvxopt import matrix
 # import your SVM training code
 
 # parameters
@@ -12,7 +13,11 @@ try:
     train = loadtxt('/Users/dholtz/Downloads/hw2_resources/data/data_'+name+'_train.csv')
 except:
     train = loadtxt('/Users/mfzhao/Downloads/hw2_resources/data/data_'+name+'_train.csv')
-# use deep copy here to make cvxopt happy
+import numpy as np
+from plotBoundary import *
+import cvxopt
+import sys
+# import your SVM training code
 X = train[:, 0:2].copy()
 Y = train[:, 2:3].copy()
 
@@ -22,6 +27,7 @@ def linear_kernel(x1, x2):
 def polynomial_kernel(x, y, p=3):
     return (1 + np.dot(x, y)) ** p
 
+sigma =  1
 def gaussian_kernel(x, y):
     global sigma
     return np.exp(-linalg.norm(x-y)**2 / (2 * (sigma ** 2)))
@@ -34,8 +40,6 @@ kernel = gaussian_kernel
 
 # Carry out training, primal and/or dual
 def trainSVM(X, y, kernel, C):
-	print y.shape 
-	print X.shape
 	n_samples, n_features = X.shape
 	K = np.zeros((n_samples, n_samples))
 	for i in range(n_samples):
@@ -44,12 +48,7 @@ def trainSVM(X, y, kernel, C):
 
 	P = cvxopt.matrix(np.outer(y,y) * K)
 	q = cvxopt.matrix(np.ones(n_samples) * -1.)
-	print y.shape 
-	print y.dtype
-	print (1, n_samples)
-	print y
-	print 
-	A = cvxopt.matrix(np.array(y), (1, n_samples))
+	A = cvxopt.matrix(y, (1, n_samples))
 	b = cvxopt.matrix(0.0)
 
 	G = cvxopt.matrix(np.vstack([np.diag(np.ones(n_samples) * -1.), np.diag(np.ones(n_samples))]))
@@ -156,15 +155,3 @@ def geometricMarginSVM():
 #y_predict = np.reshape(y_predict, (len(y_predict), -1))
 #correct = float(np.sum(Y == y_predict))/len(Y)
 #print correct
-
-for i in (.01, .1, 1, 10, 100):
-	#for sig in (.01, .1, 1, 10, 100):
-	for sig in ([1.]):
-		print 'C = ', i 
-		print 'sigma = ', sig 
-		sigma = sig
-		kernel = linear_kernel
-		C = i 
-		n_features, K, alpha, sv, sv_y, sv_bool, ind = trainSVM(X, Y, kernel, C=i)
-		print 'geometric margin', geometricMarginSVM()
-		print 'geometric margin', geometricMarginSVM()
