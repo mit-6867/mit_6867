@@ -1,0 +1,31 @@
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry} 
+\usepackage{enumerate, xfrac, color, graphicx}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,mathabx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{pifont}
+\usepackage{listings, courier}
+\graphicspath{{/Users/mfzhao/Dropbox/}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\lstset{breaklines=true, basicstyle=\small\ttfamily, language=R, backgroundcolor=\color{highlight}, stepnumber=5}
+
+\definecolor{highlight}{RGB}{248,248,248}
+
+\begin{document}
+	\title{6.867 Problem Set 3}
+	\maketitle
+	
+\subsubsection*{Neural Networks}
+
+\begin{equation}
+\frac{\partial J(w)}{\partial w_{kj}^{(2)}} = \sum_{i=1}^N z_j \left(y_k^{(i)}(1-\sigma(a_k^{(2)}) + (1-y_k^{(i)})(\sigma(a_k^{(2)})\right) + 2 \lambda w_{kj}^{(2)}
+\end{equation}
+\begin{equation}
+\frac{\partial J(w)}{\partial w_{jd}^{(1)}} = \sum_{i=1}^N x_i \sum_{k=1}^{K} \left(y_k^{(i)}(1-\sigma(a_k^{(2)}) + (1-y_k^{(i)})(\sigma(a_k^{(2)})\right) w_{kj}^{(2)} \left(\frac{1}{1+e^{-a_{jd}^{(1)}}}\right)\left(1-\frac{1}{1+e^{-a_{jd}^{(1)}}}\right) + 2 \lambda w_{jd}^{(1)}
+\end{equation}
+	
+\end{document}
