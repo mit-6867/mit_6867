@@ -6,7 +6,7 @@ from scipy.special import expit
 filename = "/Users/dholtz/Downloads/hw3_resources/toy_multiclass_2_train.csv"
 T = scipy.io.loadmat(filename, appendmat=False)['toy_data']
 
-X_train = T[:,0:2]
+X_train = T[:,0:2]	
 Y_train = T[:,2:3]
 print len(np.unique(Y_train))
 print Y_train.shape[0]
@@ -28,8 +28,13 @@ def forwardProp(X_train, w1, w2, b1, b2, activation_functions):
     return output, activations, output2, activations2
 
 def lossFunction(output, Y_train, l, w1, w2):
-	Y_train_matrix = np.zeros((Y_train.shape[0], len(np.unique(Y_train))))
-	Y_train_locations = np.hstack([np.arange(Y_train.shape[0]).reshape(-1, 1), Y_train-1])
+	# m = number of data points
+	# k = number of outputs
+    m = Y_train.shape[0]
+    k = len(np.unique(Y_train))
+
+	Y_train_matrix = np.zeros((m, k))
+	Y_train_locations = np.hstack([np.arange(m).reshape(-1, 1), Y_train-1])
 	Y_train_matrix[Y_train_locations[:,0:1].astype(int), Y_train_locations[:,1:].astype(int)] = 1
 	loss = np.sum(-Y_train_matrix*np.log(output) - (1-Y_train_matrix)*np.log(1-output)) + l*(np.sum(w1**2) + np.sum(w2**2))
 	print loss
