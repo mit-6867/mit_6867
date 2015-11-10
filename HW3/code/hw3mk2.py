@@ -35,6 +35,8 @@ def NNet(X, Y, m, l, a, crit=1e-5, maxiter = 100000):
     w2 = (2*np.random.random((m,k))-1)*0.5
     b1 = np.zeros((1,m))
     b2 = np.zeros((1,k))
+    g1 = np.ones((d,m))
+    g2 = np.ones((m,k))
     it = 0
     count = 0
     lossPrev = 10000000
@@ -43,23 +45,26 @@ def NNet(X, Y, m, l, a, crit=1e-5, maxiter = 100000):
         lossPrev = lossNow
         z2, a2, z3, a3 = fprop(w1, w2, b1, b2, X)
         lossNow = np.sum(LossFn(a3, Y))
+        #print it, ':', lossNow
         if np.abs(lossPrev - lossNow) < crit:
             count += 1
         else:
             count = 0
         delta3 = a3 - Y
-        w2update = np.dot(np.transpose(a2), delta3)/n + 2*l*w2
+        w2update = np.dot(np.transpose(a2), delta3)/n
         delta2 = np.dot(delta3, np.transpose(w2))*dsigm(z2)
-        w1update = np.dot(np.transpose(X), delta2)/n + 2*l*w1
+        w1update = np.dot(np.transpose(X), delta2)/n
         
-        w2 -= a*w2update
-        w1 -= a*w1update
+        g2 += w2update**2
+        g1 += w1update**2
+        w2 -= a*(w2update + 2*l*w2)/np.sqrt(g2)
+        w1 -= a*(w1update + 2*l*w1)/np.sqrt(g1)
         b2 -= delta3.sum(axis=0)/n
         b1 -= delta2.sum(axis=0)/n
         it += 1
         if it == maxiter:
             print 'Maximum number of iterations reached. Convergence Criterion not met.'
-            break
+            return w1, w2, b1, b2
     return w1, w2, b1, b2
 
 def sgdNNet(X, Y, m, l, a, n, crit=1e-5, maxiter = 100000):
@@ -69,6 +74,8 @@ def sgdNNet(X, Y, m, l, a, n, crit=1e-5, maxiter = 100000):
     w2 = (2*np.random.random((m,k))-1)*0.5
     b1 = np.zeros((1,m))
     b2 = np.zeros((1,k))
+    g1 = np.ones((d,m))
+    g2 = np.ones((m,k))
     it = 0
     count = 0
     lossPrev = 10000000
@@ -77,25 +84,29 @@ def sgdNNet(X, Y, m, l, a, n, crit=1e-5, maxiter = 100000):
     while count < 2:
         ind = random.sample(range(300), n)
         lossPrev = lossNow
+        fz2, fa2, fz3, fa3 = fprop(w1, w2, b1, b2, X)
         z2, a2, z3, a3 = fprop(w1, w2, b1, b2, X[ind])
-        lossNow = np.sum(LossFn(a3, Y[ind]))
+        lossNow = np.sum(LossFn(fa3, Y))
+        #print it, ':', lossNow
         if np.abs(lossPrev - lossNow) < crit:
             count += 1
         else:
             count = 0
         delta3 = a3 - Y[ind]
-        w2update = np.dot(np.transpose(a2), delta3)/n + 2*l*w2
+        w2update = np.dot(np.transpose(a2), delta3)/n
         delta2 = np.dot(delta3, np.transpose(w2))*dsigm(z2)
-        w1update = np.dot(np.transpose(X[ind]), delta2)/n + 2*l*w1
+        w1update = np.dot(np.transpose(X[ind]), delta2)/n
         
-        w2 -= a*w2update
-        w1 -= a*w1update
+        g2 += w2update**2
+        g1 += w1update**2
+        w2 -= a*(w2update + 2*l*w2)/np.sqrt(g2)
+        w1 -= a*(w1update + 2*l*w1)/np.sqrt(g1)
         b2 -= delta3.sum(axis=0)/n
         b1 -= delta2.sum(axis=0)/n
         it += 1
         if it == maxiter:
             print 'Maximum number of iterations reached. Convergence Criterion not met.'
-            break
+            return w1, w2, b1, b2
     return w1, w2, b1, b2
 
 def nnPredict(w1, w2, b1, b2, Xv):
