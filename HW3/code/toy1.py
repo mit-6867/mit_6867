@@ -2,9 +2,9 @@ from hw3mk2 import *
 import scipy
 from tabulate import tabulate
 
-pathTr = "/Downloads/hw3_resources/toy_multiclass_2_train.csv"
-pathV = "/Downloads/hw3_resources/toy_multiclass_2_validate.csv"
-pathTe = "/Downloads/hw3_resources/toy_multiclass_2_test.csv"
+pathTr = "/Downloads/hw3_resources/toy_multiclass_1_train.csv"
+pathV = "/Downloads/hw3_resources/toy_multiclass_1_validate.csv"
+pathTe = "/Downloads/hw3_resources/toy_multiclass_1_test.csv"
 try:
     filename = "/Users/mfzhao/"+pathTr
     Tr = scipy.io.loadmat(filename, appendmat=False)['toy_data']
@@ -95,10 +95,10 @@ def SGDgrid(Xtr, YtrM, Xv, YvM):
     print 'SGD - Validation Error:     ', besterr
     return trE, vE
     
-TrErr_M, VErr_M = gridSearch(Xtr, YtrM, Xv, YvM)
+#TrErr_M, VErr_M = gridSearch(Xtr, YtrM, Xv, YvM)
 TrErr_SGD, VErr_SGD = SGDgrid(Xtr, YtrM, Xv, YvM)
 
-print tabulate(np.round(TrErr_M, 3), tablefmt='latex')
-print tabulate(np.round(VErr_M, 3), tablefmt='latex')
+#print tabulate(np.round(TrErr_M, 3), tablefmt='latex')
+#print tabulate(np.round(VErr_M, 3), tablefmt='latex')
 print tabulate(np.round(TrErr_SGD, 3), tablefmt='latex')
 print tabulate(np.round(VErr_SGD, 3), tablefmt='latex')
