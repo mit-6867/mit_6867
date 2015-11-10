@@ -77,6 +77,19 @@ In order to calculate the gradient as a function of $w_1$ and $w_2$, we use the 
 
 Let's now see how a neural network performs on two different toy data sets. We vary both the number of hidden nodes and the regularization parameter in our objective function, and use both full gradient descent and batch gradient descent. The two algorithms perform comparably - in the case of toy data set number 2, we find that the full gradient descent algorithm does a slightly better job at finding the optimal values of our parameter than stochastic gradient descent (classification error of 6.7\% as opposed to 9\%). Our changes in parameters have a much larger effect on the performance for toy dataset 2 than for our features in toy dataset 1. This is likely due to the lack of an easy way to separate examples of different classes in dataset 2.
 
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{.48\linewidth}
+		\includegraphics[width=1\linewidth, height=2.7in]{t1dist.jpg}
+		\caption*{Toy Dataset \#1}
+	\end{minipage}
+	\begin{minipage}[b]{.48\linewidth}
+		\includegraphics[width=1\linewidth, height=2.7in]{t2dist.jpg}
+		\caption*{Toy Dataset \#2}
+	\end{minipage}
+	\caption{Distributions of different classes in $X1$, $X2$ for toy datasets}
+\end{figure}
+
 \begin{table}
 \captionof{table}{Performance of neural network with full gradient descent on Toy Data Set 1 (training)} 
 \centering
