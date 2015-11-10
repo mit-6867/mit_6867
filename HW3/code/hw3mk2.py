@@ -43,7 +43,6 @@ def NNet(X, Y, m, l, a, crit=1e-5, maxiter = 100000):
         lossPrev = lossNow
         z2, a2, z3, a3 = fprop(w1, w2, b1, b2, X)
         lossNow = np.sum(LossFn(a3, Y))
-        print lossNow
         if np.abs(lossPrev - lossNow) < crit:
             count += 1
         else:
@@ -80,7 +79,6 @@ def sgdNNet(X, Y, m, l, a, n, crit=1e-5, maxiter = 100000):
         lossPrev = lossNow
         z2, a2, z3, a3 = fprop(w1, w2, b1, b2, X[ind])
         lossNow = np.sum(LossFn(a3, Y[ind]))
-        print lossNow
         if np.abs(lossPrev - lossNow) < crit:
             count += 1
         else:
@@ -88,7 +86,7 @@ def sgdNNet(X, Y, m, l, a, n, crit=1e-5, maxiter = 100000):
         delta3 = a3 - Y[ind]
         w2update = np.dot(np.transpose(a2), delta3)/n + 2*l*w2
         delta2 = np.dot(delta3, np.transpose(w2))*dsigm(z2)
-        w1update = np.dot(np.transpose(X), delta2)/n + 2*l*w1
+        w1update = np.dot(np.transpose(X[ind]), delta2)/n + 2*l*w1
         
         w2 -= a*w2update
         w1 -= a*w1update
@@ -107,6 +105,5 @@ def nnPredict(w1, w2, b1, b2, Xv):
 
 def classificationError(yPredict, Y):
     classificationError = 1-np.sum(np.array(yPredict.reshape(-1, 1) == Y.reshape(-1, 1), dtype=bool))/float(Y.shape[0])
-    print classificationError
     return classificationError
 

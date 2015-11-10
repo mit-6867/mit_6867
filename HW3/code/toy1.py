@@ -1,9 +1,10 @@
 from hw3mk2 import *
 import scipy
+from tabulate import tabulate
 
-pathTr = "/Downloads/hw3_resources/toy_multiclass_1_train.csv"
-pathV = "/Downloads/hw3_resources/toy_multiclass_1_validate.csv"
-pathTe = "/Downloads/hw3_resources/toy_multiclass_1_test.csv"
+pathTr = "/Downloads/hw3_resources/toy_multiclass_2_train.csv"
+pathV = "/Downloads/hw3_resources/toy_multiclass_2_validate.csv"
+pathTe = "/Downloads/hw3_resources/toy_multiclass_2_test.csv"
 try:
     filename = "/Users/mfzhao/"+pathTr
     Tr = scipy.io.loadmat(filename, appendmat=False)['toy_data']
@@ -12,11 +13,11 @@ try:
     filename = "/Users/mfzhao/"+pathTe
     Te = scipy.io.loadmat(filename, appendmat=False)['toy_data']
 except:
-    filename = "/Users/mfzhao/"+pathTr
+    filename = "/Users/dholtz/"+pathTr
     Tr = scipy.io.loadmat(filename, appendmat=False)['toy_data']
-    filename = "/Users/mfzhao/"+pathV
+    filename = "/Users/dholtz/"+pathV
     V = scipy.io.loadmat(filename, appendmat=False)['toy_data']
-    filename = "/Users/mfzhao/"+pathTe
+    filename = "/Users/dholtz/"+pathTe
     Te = scipy.io.loadmat(filename, appendmat=False)['toy_data']
     
     
@@ -31,8 +32,8 @@ Yte = Te[:,Te.shape[1]-1:Te.shape[1]]
 YteM = oneHot(Yte)
 
 def gridSearch(Xtr, YtrM, Xv, YvM):
-    lamb = [0, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
-    h = [1,2,3,4,5,6,7,8,9,10]
+    lamb = [0, 1e-5, 1e-3, 1e-1]
+    h = [1,3,5,7,9]
     besttr = 1
     besterr = 1
     bestl = 0
@@ -43,17 +44,18 @@ def gridSearch(Xtr, YtrM, Xv, YvM):
     for l in lamb:
         j=0
         for m in h:
+            print l, m
             w1, w2, b1, b2 = NNet(Xtr, YtrM, m, l, 15, crit=1e-3)
             yhattr = nnPredict(w1, w2, b1, b2, Xtr)
-            trE[i,j] = classificationError(yhattr, YtrM)
+            trE[i,j] = classificationError(yhattr, Ytr)
             yhatv = nnPredict(w1, w2, b1, b2, Xv)
-            vE[i,j] = classificationError(yhatv, YvM)
-            j += 1
+            vE[i,j] = classificationError(yhatv, Yv)
             if vE[i,j] < besterr:
                 besterr = vE[i,j]
                 besttr = trE[i,j]
                 bestl = l
                 bestm = m
+            j += 1
         i += 1
     print 'optimal lambda:       ', bestl
     print 'optimal hidden units: ', bestm
@@ -62,8 +64,8 @@ def gridSearch(Xtr, YtrM, Xv, YvM):
     return trE, vE
     
 def SGDgrid(Xtr, YtrM, Xv, YvM):
-    lamb = [0, 1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1]
-    h = [1,2,3,4,5,6,7,8,9,10]
+    lamb = [0, 1e-5, 1e-3, 1e-1]
+    h = [1,3,5,7,9]
     besttr = 1
     besterr = 1
     bestl = 0
@@ -74,17 +76,18 @@ def SGDgrid(Xtr, YtrM, Xv, YvM):
     for l in lamb:
         j=0
         for m in h:
+            print l, m
             w1, w2, b1, b2 = sgdNNet(Xtr, YtrM, m, l, 15, 10, crit=1e-3)
             yhattr = nnPredict(w1, w2, b1, b2, Xtr)
-            trE[i,j] = classificationError(yhattr, YtrM)
+            trE[i,j] = classificationError(yhattr, Ytr)
             yhatv = nnPredict(w1, w2, b1, b2, Xv)
-            vE[i,j] = classificationError(yhatv, YvM)
-            j += 1
+            vE[i,j] = classificationError(yhatv, Yv)
             if vE[i,j] < besterr:
                 besterr = vE[i,j]
                 besttr = trE[i,j]
                 bestl = l
                 bestm = m
+            j += 1
         i += 1
     print 'SGD - optimal lambda:       ', bestl
     print 'SGD - optimal hidden units: ', bestm
@@ -93,4 +96,9 @@ def SGDgrid(Xtr, YtrM, Xv, YvM):
     return trE, vE
     
 TrErr_M, VErr_M = gridSearch(Xtr, YtrM, Xv, YvM)
-TrErr_M, VErr_M = SGDgrid(Xtr, YtrM, Xv, YvM)
+TrErr_SGD, VErr_SGD = SGDgrid(Xtr, YtrM, Xv, YvM)
+
+print tabulate(np.round(TrErr_M, 3), tablefmt='latex')
+print tabulate(np.round(VErr_M, 3), tablefmt='latex')
+print tabulate(np.round(TrErr_SGD, 3), tablefmt='latex')
+print tabulate(np.round(VErr_SGD, 3), tablefmt='latex')

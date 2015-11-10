@@ -66,13 +66,137 @@ l(w) = \sum_{i=1}^N \sum_{k=1}^{K} [-y_k^{(i)}\log(h_k(x^{(i)},w)) - (1-y_k^{(i)
 In order to calculate the gradient as a function of $w_1$ and $w_2$, we use the two gradient calculation expressions below:
 
 \begin{equation}
-\frac{\partial J(w)}{\partial w_{kj}^{(2)}} = -\left ( \sum_{i=1}^N z_j \left(y_k^{(i)}(1-\sigma(a_k^{(2)}) + (1-y_k^{(i)})(\sigma(a_k^{(2)})\right) \right ) + 2 \lambda w_{kj}^{(2)}
+\frac{\partial J(w)}{\partial w_{kj}^{(2)}} = \sum_{i=1}^N z_j \left(\sigma(a_k^{(2)}) -y_k^{(i)} \right) + 2 \lambda w_{kj}^{(2)}
 \end{equation}
 
 \noindent and 
 
 \begin{equation}
-\frac{\partial J(w)}{\partial w_{jd}^{(1)}} = -\left ( \sum_{i=1}^N x_i \sum_{k=1}^{K} \left(y_k^{(i)}(1-\sigma(a_k^{(2)}) + (1-y_k^{(i)})(\sigma(a_k^{(2)})\right) w_{kj}^{(2)} \left(\frac{1}{1+e^{-a_{jd}^{(1)}}}\right)\left(1-\frac{1}{1+e^{-a_{jd}^{(1)}}}\right)\right ) + 2 \lambda w_{jd}^{(1)}.
+\frac{\partial J(w)}{\partial w_{jd}^{(1)}} =  \sum_{i=1}^N x_i \sum_{k=1}^{K} \left(\sigma(a_k^{(2)}) -y_k^{(i)}\right) w_{kj}^{(2)} \left(\frac{1}{1+e^{-a_{jd}^{(1)}}}\right)\left(1-\frac{1}{1+e^{-a_{jd}^{(1)}}}\right) + 2 \lambda w_{jd}^{(1)}.
 \end{equation}
+
+Let's now see how a neural network performs on two different toy data sets. We vary both the number of hidden nodes and the regularization parameter in our objective function, and use both full gradient descent and batch gradient descent. The two algorithms perform comparably - in the case of toy data set number 2, we find that the full gradient descent algorithm does a slightly better job at finding the optimal values of our parameter than stochastic gradient descent (classification error of 6.7\% as opposed to 9\%). Our changes in parameters have a much larger effect on the performance for toy dataset 2 than for our features in toy dataset 1. This is likely due to the lack of an easy way to separate examples of different classes in dataset 2.
+
+\begin{table}
+\captionof{table}{Performance of neural network with full gradient descent on Toy Data Set 1 (training)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &  0.007 & \bf{0}     & 0     & 0     & 0     \\
+$\lambda$ = \bf{1e-5} & 0.007 & 0     & 0     & 0     & 0     \\
+$\lambda$ = \bf{1e-3} & 0.093 & 0.003 & 0.003 & 0.003 & 0.003 \\
+$\lambda$ = \bf{1e-1} & 0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionof{table}{Performance of neural network with full gradient descent on Toy Data Set 1 (validation)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &      0.01  & \bf{0.003} & 0.003 & 0.003 & 0.003 \\
+$\lambda$ = \bf{1e-5} &  0.01  & 0.003 & 0.003 & 0.003 & 0.003 \\
+$\lambda$ = \bf{1e-3} &  0.063 & 0.003 & 0.003 & 0.003 & 0.007 \\
+$\lambda$ = \bf{1e-1} &  0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionof{table}{Performance of neural network with stochastic gradient descent on Toy Data Set 1 (training)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &       0.003 & \bf{0.003} & 0.003 & 0.003 & 0.003 \\
+$\lambda$ = \bf{1e-5} &   0.037 & 0.003 & 0.003 & 0.003 & 0.003 \\
+$\lambda$ = \bf{1e-3} &   0.333 & 0.003 & 0     & 0.003 & 0.003 \\
+$\lambda$ = \bf{1e-1} &   0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+	
+\begin{table}
+\captionof{table}{Performance of neural network with stochastic gradient descent on Toy Data Set 1 (validation)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &        0.01  & \bf{0.003} & 0.003 & 0.003 & 0.003 \\
+$\lambda$ = \bf{1e-5} &    0.03  & 0.003 & 0.007 & 0.003 & 0.007 \\
+$\lambda$ = \bf{1e-3} &    0.333 & 0.007 & 0.01  & 0.01  & 0.017 \\
+$\lambda$ = \bf{1e-1} &    0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{table}
+\captionof{table}{Performance of neural network with full gradient descent on Toy Data Set 2 (training)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &  0.36  & 0.063 & 0.047 & 0.05  & 0.027 \\
+$\lambda$ = \bf{1e-5} & 0.397 & 0.063 & 0.067 & 0.063 & 0.067 \\
+$\lambda$ = \bf{1e-3} & 0.413 & \bf{0.06}  & 0.06  & 0.06  & 0.06  \\
+$\lambda$ = \bf{1e-1} & 0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionof{table}{Performance of neural network with full gradient descent on Toy Data Set 2 (validation)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &      0.343 & 0.07  & 0.093 & 0.1   & 0.107 \\
+$\lambda$ = \bf{1e-5} &   0.39  & 0.073 & 0.07  & 0.073 & 0.073 \\
+$\lambda$ = \bf{1e-3} &  0.38  & \bf{0.067} & 0.067 & 0.067 & 0.067 \\
+$\lambda$ = \bf{1e-1} &  0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\captionof{table}{Performance of neural network with stochastic gradient descent on Toy Data Set 2 (training)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &       0.367 & 0.077 & 0.063 & 0.057 & 0.05  \\
+$\lambda$ = \bf{1e-5} &   0.363 & 0.073 & \bf{0.067} & 0.063 & 0.063 \\
+$\lambda$ = \bf{1e-3} &   0.357 & 0.087 & 0.083 & 0.083 & 0.09  \\
+$\lambda$ = \bf{1e-1} &   0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+	
+\begin{table}
+\captionof{table}{Performance of neural network with stochastic gradient descent on Toy Data Set 2 (validation)} 
+\centering
+\begin{tabular}{llllll}
+\toprule
+& $n_1$ = \bf{1} & $n_1$ =  \bf{3} & $n_1$ =  \bf{5} & $n_1$ =  \bf{7} & $n_1$ =  \bf{9} \\
+\midrule
+$\lambda$ = \bf{0} &        0.373 & 0.097 & 0.11  & 0.117 & 0.113 \\
+$\lambda$ = \bf{1e-5} &    0.373 & 0.103 & \bf{0.09}  & 0.09  & 0.09  \\
+$\lambda$ = \bf{1e-3} &    0.37  & 0.107 & 0.103 & 0.103 & 0.103 \\
+$\lambda$ = \bf{1e-1} &    0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
+\bottomrule
+\end{tabular}
+\end{table}
+	
 	
 \end{document}
