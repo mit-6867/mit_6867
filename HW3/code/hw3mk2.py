@@ -2,15 +2,7 @@ import numpy as np
 import scipy.io 
 import sys
 from scipy.special import expit
-
-
-path = "/Downloads/hw3_resources/mnist_train.csv"
-try:
-    filename = "/Users/dholtz/"+path
-    T = scipy.io.loadmat(filename, appendmat=False)['tr']
-except:
-    filename = "/Users/mfzhao/"+path
-    T = scipy.io.loadmat(filename, appendmat=False)['tr']
+import random
 
 def sigm(x):
     x = np.clip(x, -500, 500)
@@ -35,7 +27,7 @@ def oneHot(Y):
 def LossFn(py, Y):
     return -Y*np.log(py)-(1-Y)*np.log(1-py)
     
-def NNet(X, Y, m, l, a, crit=1e-5):
+def NNet(X, Y, m, l, a, crit=1e-5, maxiter = 100000):
     n = Y.shape[0]
     d = X.shape[1] 
     k = Y.shape[1]
@@ -43,10 +35,10 @@ def NNet(X, Y, m, l, a, crit=1e-5):
     w2 = (2*np.random.random((m,k))-1)*0.5
     b1 = np.zeros((1,m))
     b2 = np.zeros((1,k))
+    it = 0
     count = 0
     lossPrev = 10000000
     lossNow = 100000
-    
     while count < 2:
         lossPrev = lossNow
         z2, a2, z3, a3 = fprop(w1, w2, b1, b2, X)
@@ -54,6 +46,8 @@ def NNet(X, Y, m, l, a, crit=1e-5):
         print lossNow
         if np.abs(lossPrev - lossNow) < crit:
             count += 1
+        else:
+            count = 0
         delta3 = a3 - Y
         w2update = np.dot(np.transpose(a2), delta3)/n + 2*l*w2
         delta2 = np.dot(delta3, np.transpose(w2))*dsigm(z2)
@@ -63,6 +57,47 @@ def NNet(X, Y, m, l, a, crit=1e-5):
         w1 -= a*w1update
         b2 -= delta3.sum(axis=0)/n
         b1 -= delta2.sum(axis=0)/n
+        it += 1
+        if it == maxiter:
+            print 'Maximum number of iterations reached. Convergence Criterion not met.'
+            break
+    return w1, w2, b1, b2
+
+def sgdNNet(X, Y, m, l, a, n, crit=1e-5, maxiter = 100000):
+    d = X.shape[1] 
+    k = Y.shape[1]
+    w1 = (2*np.random.random((d,m))-1)*0.5
+    w2 = (2*np.random.random((m,k))-1)*0.5
+    b1 = np.zeros((1,m))
+    b2 = np.zeros((1,k))
+    it = 0
+    count = 0
+    lossPrev = 10000000
+    lossNow = 100000
+    random.seed(84721)
+    while count < 2:
+        ind = random.sample(range(300), n)
+        lossPrev = lossNow
+        z2, a2, z3, a3 = fprop(w1, w2, b1, b2, X[ind])
+        lossNow = np.sum(LossFn(a3, Y[ind]))
+        print lossNow
+        if np.abs(lossPrev - lossNow) < crit:
+            count += 1
+        else:
+            count = 0
+        delta3 = a3 - Y[ind]
+        w2update = np.dot(np.transpose(a2), delta3)/n + 2*l*w2
+        delta2 = np.dot(delta3, np.transpose(w2))*dsigm(z2)
+        w1update = np.dot(np.transpose(X), delta2)/n + 2*l*w1
+        
+        w2 -= a*w2update
+        w1 -= a*w1update
+        b2 -= delta3.sum(axis=0)/n
+        b1 -= delta2.sum(axis=0)/n
+        it += 1
+        if it == maxiter:
+            print 'Maximum number of iterations reached. Convergence Criterion not met.'
+            break
     return w1, w2, b1, b2
 
 def nnPredict(w1, w2, b1, b2, Xv):
@@ -75,12 +110,3 @@ def classificationError(yPredict, Y):
     print classificationError
     return classificationError
 
-Xtr = T[:,0:T.shape[1]-1]
-Ytr = T[:,T.shape[1]-1:T.shape[1]]
-YtrM = oneHot(Ytr)
-
-np.random.seed(11210)
-w1, w2, b1, b2 = NNet(Xtr, YtrM, 200, 0.01, .05, crit=1e-4)
-yhat = nnPredict(w1, w2, b1, b2, Xtr)
-
-classificationError(yhat, Ytr)
