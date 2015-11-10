@@ -80,7 +80,7 @@ Ytr = T[:,T.shape[1]-1:T.shape[1]]
 YtrM = oneHot(Ytr)
 
 np.random.seed(11210)
-w1, w2, b1, b2 = NNet(Xtr, YtrM, 200, 0.01, .1, crit=1e-4)
+w1, w2, b1, b2 = NNet(Xtr, YtrM, 200, 0.01, .05, crit=1e-4)
 yhat = nnPredict(w1, w2, b1, b2, Xtr)
 
 classificationError(yhat, Ytr)
