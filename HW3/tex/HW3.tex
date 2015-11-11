@@ -94,7 +94,7 @@ In order to calculate the gradient as a function of $w_1$ and $w_2$, we use the 
 
 Let's now see how a neural network performs on two different toy data sets. We vary both the number of hidden nodes and the regularization parameter in our objective function, and use both full gradient descent and mini-batch stochastic gradient descent (with a batch size of 10). In particular, we use mini-batch SGD as opposed to full SGD (where batch size is 1) since mini-batch generally has better convergence properties. The two algorithms perform comparably - in the case of toy data set number 2, we find that the full gradient descent algorithm does a slightly better job at finding the optimal values of our parameter than stochastic gradient descent (classification error of 6.7\% as opposed to 9\%). While full gradient descent does perform better, its important to note the SGD was significantly faster. This should be expected since full-batch uses the entire dataset to perform an update while SGD only uses a fraction, meaning that when we use SGD as opposed to full gradient descent we lose some of the nice convergence properties to gain faster updates. 
 
-It's important to note that our changes in parameters have a much larger effect on the performance for toy dataset 2 than for our features in toy dataset 1. This is likely due to the lack of an easy way to separate examples of different classes in dataset 2.
+It's important to note that our changes in parameters have a much larger effect on the performance for toy dataset 2 than for our features in toy dataset 1. This is likely due to the fact that the second toy dataset is not as easily separable, as seen in the plots below. While a researcher can essentially achieve 100\% classification accuracy by drawing vertical lines to classify toy dataset \#1, there is overlap in the locations of our classes in toy dataset \#2. Consequently, the regularization constants have more influence on performance.
 
 \begin{figure}[ht]
 	\centering
@@ -159,6 +159,12 @@ Toy Dataset 2 (Validation) & SGD & 1e-1 &   0.667 & 0.667 & 0.667 & 0.667 & 0.66
 \end{tabular}
 \end{table}
 
+We are now interested in testing out our neural network code on a real dataset. In our case, we're using a subset of the very popular MNIST data collected by Yann Lecunn. This dataset is comprised of 28 by 28 pixel images of handwritten digits with corresponding labels that represent what numbers these images actually represent. For our features, each 28x28 image is transformed into a feature vector of 784 where each of these features represents the darkness of a pixel (0 means that its a white pixel, 1 means its a black pixel, everything in between are shades of grey). Our dataset only consists of 6 distinct digits. 
+
+We again train both full-batch and stochastic gradient descent (batch size = 25) neural networks on the MNIST data, with a variety of different learning rates, regularization parameters and numbers of hidden nodes. The classification errors on both training and validation sets are found in Table 2, with best results in bold. 
+
+As expected, we see that SGD performs slightly worse than full-batch gradient descent, since it does not overfit as much. Our data seems to show that increasing the number of hidden nodes strictly increasing performance - this is not surprising, although we imagine that as you continue to increase $n_1$, you begin to get diminishing returns for increasing computational complexity. Decreasing the step size (i.e., smaller learning rate) also seems to lead us to achieve slightly better learning rates, although this causes the algorithm to require many more iterations to converge. A chart of the neural network classification error on the MNIST validation set can be found in Figure 2.
+
 \begin{table}
 \captionof{table}{Neural Net Classification Error Rates on MNIST dataset for different choices of parameters} 
 \centering
@@ -209,10 +215,11 @@ Validation & .01 & SGD & 1e-1 & 0.622 & 0.548 & 0.504 \\
 \end{tabular}
 \end{table}
 
-We are now interested in testing out neural network code on a real dataset. In our case, we're using a subset the very popular MNIST data collected by Yann Lecunn. This dataset is comprised of 28 by 28 pixel images of handwritten digits with corresponding labels that represent what numbers these images actually represent. For our features, each 28x28 images into a feature vector of 784 where each of these features represent the darkness of a pixel (0 means that its a white pixel, 1 means its a black pixel, everything in between are shades of grey).
-
-When training 
-
+\begin{figure}
+\center
+\includegraphics[height=4in, width=5in]{nnperf.jpg}
+\caption*{Figure 2: Neural Network Classification Error on MNIST Validation Sets}
+\end{figure}
 
 	
 \end{document}
