@@ -23,7 +23,9 @@
 
 In some cases, we might want to use a neural network rather than another algorithm, such as SVM or logistic regression, in order to be somewhat more agnostic about the parametric form of the data-generating process. In this case, we investigate the use of neural networks, first on some toy training data sets, and subsequently on a subset of the popular MNIST dataset.
 
-Let us first briefly review the way that neural network works. A neural network consists of a variable number of ``hidden layers``. A weight matrix maps each of your data points to a value for each node in the hidden layer. We then evaluate some ``activation function`` on each node value (typically a sigmoid function or tanh function) to get a new set of ``inputs`` for the next layer of the neural network. We continue this process until we finally arrive at our output predictions.  A schematic sketch of a neural net can be found below.
+Let us first briefly review the way that neural network works. Neural networks are inspired by how brains process information. In the brain we have interconnected neurons that produce electrochemical impulses that feed into other neurons. In a neural network, we try to mimic this architecture by using interconnected ``perceptrons`` or nodes. These nodes are organized into ``layers`` which are connected to nodes in other layers, but not to nodes in the same layer. 
+
+In a feed-forward neural network (the specific type of neural network architecture we are working with). The outputs of each layer are fully connected to the next layer. These layer to layer connections are represented by a weight matrix. Functionally, the weight matrix produces a weighted linear combination of the outputs of a layer to use as the input for the next layer. This weighted linear combination is then fed into some nonlinear ``activation function`` on each node (typically a sigmoid function or tanh function) which produces the output of a node. Its important to note that the activation function needs to be nonlinear otherwise we would end up with a standard linear model (a linear combination of linear function is still a linear function). These outputs can then be fed into a new layer via the same procedure as above. We can arbitrarily choose how many of these interconnected layers we want to include in a neural network model. 
 
 \begin{figure}[ht]
 	\centering
@@ -31,14 +33,14 @@ Let us first briefly review the way that neural network works. A neural network 
 	\caption*{Figure 1: A schematic diagram of a neural network (taken from the homework assignment document)}
 \end{figure}
 
-Alternatively, a neural network may be specified as follows:
+However, a neural network model needs at the very least two layers, an input layer and an output layer. These layers are our data, where the input layer is composed of our features and the output layer is what we want to predict. In this sense, the simplest neural network  with a single node in the output layer is just a logistic regression. For networks with more than just the input layer and output layer, the intermediate layers are called ``hidden layers`` since they're not directly observed but are learned (much like a hidden state in a Hidden Markov Model). A schematic sketch of a neural net with a single hidden layer can be found above. Alternatively, this neural network may be mathematically specified as follows:
 
 \begin{equation}
 a_{n}^{(1)} = \sum_d w_{dn}^{(1)}x_d
 \end{equation}
 
 \begin{equation}
-z_{n}^{(1)} = \sigma_1(a_n^{(1)})
+z_{n}^{(1)} = f_1(a_n^{(1)})
 \end{equation}
 
 \begin{equation}
@@ -46,10 +48,25 @@ a_{k}^{(2)} = \sum_k w_{nk}^{(2)}z_n
 \end{equation}
 
 \begin{equation}
-z_{k}^{(2)} = \sigma_2(a_k^{(2)})
+y_k = z_{k}^{(2)} = f_2(a_k^{(2)})
 \end{equation}
 
-The most trivial neural network has only one output layer with one node, and no hidden layers. This would correspond to vanilla logistic regression. 
+Or in matrix notation:
+\begin{equation}
+a^{(1)} = X\cdot W^{(1)}	
+\end{equation}
+
+\begin{equation}
+z^{(1)} = f_1(a^{(1)})
+\end{equation}
+
+\begin{equation}
+a^{(2)} = z^{(1)}\cdot W^{(2)}	
+\end{equation}
+
+\begin{equation}
+y = z^{(2)} = f_1(a^{(2)})
+\end{equation}
 
 For the purposes of this paper, we will try to solve simple multi-class prediction problems using a neural network with one hidden layer. In order to determine the weight matrices that give us the best predictive accuracy, we will specify a loss function and perform (batch or stochastic) gradient descent. We specify our objective function as the regularized negative log-likelihood function:
 
@@ -72,10 +89,12 @@ In order to calculate the gradient as a function of $w_1$ and $w_2$, we use the 
 \noindent and 
 
 \begin{equation}
-\frac{\partial J(w)}{\partial w_{jd}^{(1)}} =  \sum_{i=1}^N x_i \sum_{k=1}^{K} \left(\sigma(a_k^{(2)}) -y_k^{(i)}\right) w_{kj}^{(2)} \left(\frac{1}{1+e^{-a_{jd}^{(1)}}}\right)\left(1-\frac{1}{1+e^{-a_{jd}^{(1)}}}\right) + 2 \lambda w_{jd}^{(1)}.
+\frac{\partial J(w)}{\partial w_{jd}^{(1)}} =  \sum_{i=1}^N x_i \sum_{k=1}^{K} \left(\sigma(a_k^{(2)}) -y_k^{(i)}\right) w_{kj}^{(2)} \left(\sigma(a_{jd}^{(1)})\right)\left(1-\sigma(a_{jd}^{(1)})\right) + 2 \lambda w_{jd}^{(1)}.
 \end{equation}
 
-Let's now see how a neural network performs on two different toy data sets. We vary both the number of hidden nodes and the regularization parameter in our objective function, and use both full gradient descent and batch gradient descent. The two algorithms perform comparably - in the case of toy data set number 2, we find that the full gradient descent algorithm does a slightly better job at finding the optimal values of our parameter than stochastic gradient descent (classification error of 6.7\% as opposed to 9\%). Our changes in parameters have a much larger effect on the performance for toy dataset 2 than for our features in toy dataset 1. This is likely due to the lack of an easy way to separate examples of different classes in dataset 2.
+Let's now see how a neural network performs on two different toy data sets. We vary both the number of hidden nodes and the regularization parameter in our objective function, and use both full gradient descent and mini-batch stochastic gradient descent (with a batch size of 10). In particular, we use mini-batch SGD as opposed to full SGD (where batch size is 1) since mini-batch generally has better convergence properties. The two algorithms perform comparably - in the case of toy data set number 2, we find that the full gradient descent algorithm does a slightly better job at finding the optimal values of our parameter than stochastic gradient descent (classification error of 6.7\% as opposed to 9\%). While full gradient descent does perform better, its important to note the SGD was significantly faster. This should be expected since full-batch uses the entire dataset to perform an update while SGD only uses a fraction, meaning that when we use SGD as opposed to full gradient descent we lose some of the nice convergence properties to gain faster updates. 
+
+It's important to note that our changes in parameters have a much larger effect on the performance for toy dataset 2 than for our features in toy dataset 1. This is likely due to the lack of an easy way to separate examples of different classes in dataset 2.
 
 \begin{figure}[ht]
 	\centering
@@ -210,6 +229,11 @@ $\lambda$ = \bf{1e-1} &    0.667 & 0.667 & 0.667 & 0.667 & 0.667 \\
 \bottomrule
 \end{tabular}
 \end{table}
-	
+
+We are now interested in testing out neural network code on a real dataset. In our case, we're using a subset the very popular MNIST data collected by Yann Lecunn. This dataset is comprised of 28 by 28 pixel images of handwritten digits with corresponding labels that represent what numbers these images actually represent. For our features, each 28x28 images into a feature vector of 784 where each of these features represent the darkness of a pixel (0 means that its a white pixel, 1 means its a black pixel, everything in between are shades of grey).
+
+When training 
+
+
 	
 \end{document}
