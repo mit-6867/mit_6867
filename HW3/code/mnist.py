@@ -22,7 +22,7 @@ except:
 
 def gridSearch(Xtr, YtrM, Xv, YvM, a):
     lamb = [0, .001, .01, .1]
-    h = [200, 250]
+    h = [50,100,150]
     besttr = 1
     besterr = 1
     bestl = 0
