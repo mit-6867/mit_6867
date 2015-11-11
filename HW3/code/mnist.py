@@ -22,7 +22,7 @@ except:
 
 def gridSearch(Xtr, YtrM, Xv, YvM, a):
     lamb = [0, .001, .01, .1]
-    h = [50,100,150]
+    h = [200, 250]
     besttr = 1
     besterr = 1
     bestl = 0
@@ -54,7 +54,7 @@ def gridSearch(Xtr, YtrM, Xv, YvM, a):
     
 def SGDgrid(Xtr, YtrM, Xv, YvM, a):
     lamb = [0, .001, .01, .1]
-    h = [50,100,150]
+    h = [50, 100, 150]
     besttr = 1
     besterr = 1
     bestl = 0
@@ -120,17 +120,18 @@ np.random.seed(11210)
 #print classificationError(sgdyhatv1, Yv)
 #print classificationError(sgdyhattr2, Ytr)
 #print classificationError(sgdyhatv2, Yv)
-
+print '--------------------------step size: .1--------------------------' 
 TrErr_M1, VErr_M1 = gridSearch(Xtr, YtrM, Xv, YvM, .1)
 TrErr_SGD1, VErr_SGD1 = SGDgrid(Xtr, YtrM, Xv, YvM, .1)
-TrErr_M2, VErr_M2 = gridSearch(Xtr, YtrM, Xv, YvM, .1)
-TrErr_SGD2, VErr_SGD2 = SGDgrid(Xtr, YtrM, Xv, YvM, .1)
+print '--------------------------step size: .01--------------------------'
+TrErr_M2, VErr_M2 = gridSearch(Xtr, YtrM, Xv, YvM, .01)
+TrErr_SGD2, VErr_SGD2 = SGDgrid(Xtr, YtrM, Xv, YvM, .01)
 
 print tabulate(np.round(TrErr_M1, 3), tablefmt='latex')
 print tabulate(np.round(VErr_M1, 3), tablefmt='latex')
 print tabulate(np.round(TrErr_SGD1, 3), tablefmt='latex')
 print tabulate(np.round(VErr_SGD1, 3), tablefmt='latex')
-print tabulate(np.round(TrErr_M1, 3), tablefmt='latex')
-print tabulate(np.round(VErr_M1, 3), tablefmt='latex')
-print tabulate(np.round(TrErr_SGD1, 3), tablefmt='latex')
-print tabulate(np.round(VErr_SGD1, 3), tablefmt='latex')
+print tabulate(np.round(TrErr_M2, 3), tablefmt='latex')
+print tabulate(np.round(VErr_M2, 3), tablefmt='latex')
+print tabulate(np.round(TrErr_SGD2, 3), tablefmt='latex')
+print tabulate(np.round(VErr_SGD2, 3), tablefmt='latex')
