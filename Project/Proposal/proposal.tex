@@ -28,8 +28,8 @@ Our group has access to micro-level readership and sharing data from the New Yor
 We are currently considering the following features (and methodologies to extract them) for inclusion in our model:
 \begin{itemize}
 \item Sentiment analysis (Naive Bayes text classification and tf-idf weighting)
-\item Contextual data (day-of-week and time of publication, article topic, article author, Flesch-Kincaid Reading Ease, etc.)
-\item Article uniqueness (determined using a Neural Network based language model with word vectors)
+\item Contextual data (day-of-week and time of publication, article topic, author characteristics, Flesch-Kincaid Reading Ease, etc.)
+\item Article uniqueness (determined by a Neural Network based language model using word vectors)
 \end{itemize}
 
 Note: Michael is also working on this project for Natural Language Processing (6.864). Dave and Jeremy are only enrolled in Machine Learning.
@@ -38,7 +38,7 @@ Note: Michael is also working on this project for Natural Language Processing (6
 
 Timeline:
 \begin{itemize}
-\item Nov. 12 - Nov. 19: Scrape New York Times article text, Aggregate readership data and collect non-text contextual data
+\item Nov. 12 - Nov. 19: Scrape and clean New York Times article text, Aggregate readership data and collect non-text contextual data
 \item Nov. 19 - Nov. 25: Perform sentiment analysis on text, begin training of neural network language model
 \item Nov. 25 - Dec. 2: Complete training of neural network language model, train readership regression model
 \item Dec. 3 - Dec. 8: Tweak readership model, write report, do additional fixes and optimizations as necessary
@@ -48,7 +48,7 @@ Division of Labor:
 \begin{itemize}
 \item Dave: Scrape New York Times article text, neural network language model, sentiment analysis, contribute to report, last minute optimizations
 \item Jeremy: Scrape New York Times article text, sentiment analysis, readership model, contribute to report, last minute optimizations
-\item Michael: Non-text contextual data and readership data aggregation, neural network language model (primary contributor), readership model, contribute to report, last minute optimizations
+\item Michael: Non-text contextual data extraction and readership data aggregation, neural network language model (primary contributor), readership model, contribute to report, last minute optimizations
 \end{itemize}
 
 \subsubsection*{Part III: Risks}
@@ -57,8 +57,8 @@ This project brings with it a few risks. They are listed below.
 
 \begin{itemize}
 \item The neural network language model proves very difficult to train, both in that it can be complicated to train for programmers, and require significant computational resources / time. Although we are confident we can get code to function, it may not work well given the amount of time necessary to both train the neural network and find appropriate parameter values.
-\item Data sanitization could more time-consuming than anticipated. We are using data that comes directly from the New York Times database, as well as text data scraped from the internet. This data is real and messy. It may take longer than expected to extract useful features from it, and certain features may prove infeasible to extract.
-\item Although we plan on using Berger and Milkman's result as a rough guideline, their prediction task was fundamentally different than ours, as their labels are categorical rather than numerical. We may find it difficult to draw direct comparisons between their results and ours, and may need to resort to a different (and simpler) baseline of comparison.
+\item Data sanitization could be more time-consuming than anticipated. We are using data that comes directly from the New York Times database, as well as text data scraped from the internet. This data is real and messy. It may take longer than expected to extract useful features from it, and certain features may prove infeasible to extract.
+\item Although we plan on using Berger and Milkman's result as a rough guideline, their prediction task was fundamentally different than ours, as their labels are categorical rather than numerical. Furthermore, they include some features that we are unable to replicate. We may find it difficult to draw direct comparisons between their results and ours, and may need to resort to a different (and simpler) baseline of comparison.
 \end{itemize}
 
  \begin{thebibliography}{1}
