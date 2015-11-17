@@ -1,0 +1,25 @@
+# install packages and define parse function
+
+if (!require('XML')) {install.packages('XML')}
+if (!require('httr')) {install.packages('httr')}
+
+parseArticleBody <- function(artHTML) {
+  xpath2try <- c('//div[@class="articleBody"]//p',
+                 '//p[@class="story-body-text story-content"]',
+                 '//p[@class="story-body-text"]'
+  )
+  for(xp in xpath2try) {
+    bodyi <- paste(xpathSApply(htmlParse(artHTML), xp, xmlValue), collapse='')
+    if(nchar(bodyi)>0) break
+  }
+  return(bodyi)
+}
+
+# Example: extract article text for one article
+
+url <- GET('http://www.nytimes.com/2015/11/16/world/europe/inquiry-finds-mounting-proof-of-syria-link-to-paris-attacks.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=a-lede-package-region&region=top-news&WT.nav=top-news')
+url <- GET('http://dotearth.blogs.nytimes.com/2013/08/01/google-science-fellows-challenge-companys-support-for-inhof/')
+
+html <- content(url, 'text')
+artBody <- parseArticleBody(html)
+print(artBody)
