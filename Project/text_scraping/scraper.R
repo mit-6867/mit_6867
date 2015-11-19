@@ -54,16 +54,15 @@ article_dummies <- data.frame(index = c(),
   )
 
 for (i in 1:length(article_list$article_url)) {
+  print(i)
   url <- GET(as.character(article_list$article_url[i]))
   html <- content(url, 'text')
   artBody <- parseArticleBody(html)
   write(artBody[[1]], file=paste0('article_text/', as.character(i), '.txt', sep="", collapse=""))
   article_dummies <- rbind(article_dummies, c(i, artBody[[2]], artBody[[3]]))
+  names(article_dummies) <- c('index', 'has_video', 'has_graph')
+  write.table(article_dummies, file='article_dummies.txt', quote=FALSE, row.names=F, col.names=T, sep=',')
 }
-
-names(article_dummies) <- c('index', 'has_video', 'has_graph')
-
-write.table(article_dummies, file='article_dummies.txt', quote=FALSE, row.names=F, col.names=T, sep=',')
 
 # Example: extract article text for one article
 
