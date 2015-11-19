@@ -3,6 +3,8 @@
 if (!require('XML')) {install.packages('XML')}
 if (!require('httr')) {install.packages('httr')}
 
+# old parse function, article only
+
 parseArticleBody <- function(artHTML) {
   xpath2try <- c('//div[@class="articleBody"]//p',
                  '//p[@class="story-body-text story-content"]',
@@ -14,6 +16,31 @@ parseArticleBody <- function(artHTML) {
   }
   return(bodyi)
 }
+
+# new parse function, dummy for video and interactive graph
+
+parseArticleBody <- function(artHTML) {
+  xpath2try <- c('//div[@class="articleBody"]//p',
+                 '//p[@class="story-body-text story-content"]',
+                 '//p[@class="story-body-text"]'
+  )
+  
+  for(xp in xpath2try) {
+    bodyi <- paste(xpathSApply(htmlParse(artHTML), xp, xmlValue), collapse='')
+    if(nchar(bodyi)>0) break
+  }
+  
+  xpath <- c('//a[@class="video-link"]')
+  video <- paste(xpathSApply(htmlParse(artHTML), xpath, xmlValue), collapse='')
+  if (nchar(video)!= 0) {v <- 1} else {v <- 0}
+  
+  ypath <- c('//div[@class="interactive-graphic"]')
+  graph <- paste(xpathSApply(htmlParse(artHTML), ypath, xmlValue), collapse='')
+  if (nchar(graph)!= 0) {g <- 1} else {g <- 0}
+  
+  return(list(bodyi,v,g))
+}
+
 
 # Example: extract article text for one article
 
