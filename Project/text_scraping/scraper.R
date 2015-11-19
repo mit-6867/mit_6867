@@ -41,6 +41,17 @@ parseArticleBody <- function(artHTML) {
   return(list(bodyi,v,g))
 }
 
+article_list <- read.csv('/srv/ml_project/article_list/9-list', header=F)
+names(article_list) <- c('article_url')
+
+for (i in 1:length(article_list$article_url)) {
+  url <- GET(article_list$article_url[i])
+  html <- content(url, 'text')
+  artBody <- parseArticleBody(html)
+  write(artBody[[1]], file=paste0(as.character(i), '.txt', sep="", collapse=""))
+  print(paste0(as.character(i), '.txt', sep="", collapse=""))
+}
+
 
 # Example: extract article text for one article
 
