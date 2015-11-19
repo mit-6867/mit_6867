@@ -41,23 +41,35 @@ parseArticleBody <- function(artHTML) {
   return(list(bodyi,v,g))
 }
 
-article_list <- read.csv('/srv/ml_project/article_list/9-list', header=F)
+path_to_article_list <- 'article_list.txt'
+#path_to_article_list <- '/srv/ml_project/article_list/9-list'
+
+
+article_list <- read.csv(path_to_article_list, header=F)
 names(article_list) <- c('article_url')
 
+article_dummies <- data.frame(index = c(), 
+  has_video = c(),
+  has_graph = c()
+  )
+
 for (i in 1:length(article_list$article_url)) {
-  url <- GET(article_list$article_url[i])
+  url <- GET(as.character(article_list$article_url[i]))
   html <- content(url, 'text')
   artBody <- parseArticleBody(html)
-  write(artBody[[1]], file=paste0(as.character(i), '.txt', sep="", collapse=""))
-  print(paste0(as.character(i), '.txt', sep="", collapse=""))
+  write(artBody[[1]], file=paste0('article_text/', as.character(i), '.txt', sep="", collapse=""))
+  article_dummies <- rbind(article_dummies, c(i, artBody[[2]], artBody[[3]]))
 }
 
+names(article_dummies) <- c('index', 'has_video', 'has_graph')
+
+write.table(article_dummies, file='article_dummies.txt', quote=FALSE, row.names=F, col.names=T, sep=',')
 
 # Example: extract article text for one article
 
-url <- GET('http://www.nytimes.com/2015/11/16/world/europe/inquiry-finds-mounting-proof-of-syria-link-to-paris-attacks.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=a-lede-package-region&region=top-news&WT.nav=top-news')
-url <- GET('http://dotearth.blogs.nytimes.com/2013/08/01/google-science-fellows-challenge-companys-support-for-inhof/')
+#url <- GET('http://www.nytimes.com/2015/11/16/world/europe/inquiry-finds-mounting-proof-of-syria-link-to-paris-attacks.html?hp&action=click&pgtype=Homepage&clickSource=story-heading&module=a-lede-package-region&region=top-news&WT.nav=top-news')
+#url <- GET('http://dotearth.blogs.nytimes.com/2013/08/01/google-science-fellows-challenge-companys-support-for-inhof/')
 
-html <- content(url, 'text')
-artBody <- parseArticleBody(html)
-print(artBody)
+#html <- content(url, 'text')
+#artBody <- parseArticleBody(html)
+#print(artBody)
