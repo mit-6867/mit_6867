@@ -4,3 +4,4 @@
 *.log
 *.synctex.gz
 .DS_Store
+Project/text_scraping/article_text/*.txt
