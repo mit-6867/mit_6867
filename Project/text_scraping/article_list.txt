@@ -3877,8 +3877,6 @@ http://www.nytimes.com/2013/08/13/us/california-rights-guaranteed-for-transgende
 http://www.nytimes.com/2013/08/13/us/digital-firms-to-challenge-postal-service-in-bill-paying.html
 http://www.nytimes.com/2013/08/13/us/fort-hood-gunman-told-panel-that-death-would-make-him-a-martyr.html
 http://www.nytimes.com/2013/08/13/us/james-whitey-bulger-verdict.html
-http://www.nytimes.com/2013/08/13/us/james-whitey-bulger-verdict.html
-http://popstyle.ew.com/2013/08/12/project-runway-angry-tim-gunn/
 http://www.nytimes.com/2013/08/13/us/mannings-lawyer-says-report-was-warning-sign.html
 http://www.nytimes.com/2013/08/13/us/new-hampshire-deal-reached-in-hepatitis-case.html
 http://www.nytimes.com/2013/08/13/us/new-orleans-and-us-in-standoff-on-detentions.html
@@ -5474,7 +5472,6 @@ http://www.nytimes.com/2013/08/25/arts/music/microcultures-on-the-island.html
 http://www.nytimes.com/2013/08/25/arts/music/new-music-from-sza-zeitgeber-dead-in-the-dirt-and-jonathan-moritz.html
 http://www.nytimes.com/2013/08/25/arts/music/ty-segall-releases-the-psychedelic-folk-album-sleeper.html
 http://www.nytimes.com/2013/08/25/arts/television/chevy-chase-snl-audition-interview.html
-http://www.nytimes.com/2013/08/25/arts/television/chevy-chase-snl-audition-interview.html,
 http://www.nytimes.com/2013/08/25/arts/television/dana-carvey-snl-audition-interview.html
 http://www.nytimes.com/2013/08/25/arts/television/extended-interview-with-kristen-wiig.html
 http://www.nytimes.com/2013/08/25/arts/television/extended-interview-with-will-ferrell.html
@@ -5483,7 +5480,6 @@ http://www.nytimes.com/2013/08/25/arts/television/molly-shannon-snl-audition-int
 http://www.nytimes.com/2013/08/25/arts/television/movies-and-tv-shows-examine-issues-in-foster-care.html
 http://www.nytimes.com/2013/08/25/arts/television/sharp-lawyers-willing-to-cut.html
 http://www.nytimes.com/2013/08/25/arts/television/the-god-of-snl-will-see-you-now.html
-http://www.nytimes.com/2013/08/25/arts/television/the-god-of-snl-will-see-you-now.html,
 http://www.nytimes.com/2013/08/25/arts/whats-on-today.html
 http://www.nytimes.com/2013/08/25/automobiles/autoreviews/for-americas-sedan-a-great-leap-forward.html
 http://www.nytimes.com/2013/08/25/automobiles/collectibles/a-well-traveled-concours-winner.html
@@ -6214,7 +6210,6 @@ http://www.nytimes.com/2013/08/29/world/asia/china-police-search-for-woman-accus
 http://www.nytimes.com/2013/08/29/world/asia/culprit-in-syrian-chemical-attack-is-unclear-china-insists.html
 http://www.nytimes.com/2013/08/29/world/asia/deadly-building-collapses-hit-indias-west.html
 http://www.nytimes.com/2013/08/29/world/asia/leftist-leaders-accused-of-trying-to-overthrow-south-korean-government.html
-http://www.nytimes.com/2013/08/29/world/asia/leftist-leaders-accused-of-trying-to-overthrow-south-korean-government.html,
 http://www.nytimes.com/2013/08/29/world/asia/rape-trial-casts-attention-on-offspring-of-chinas-elite.html
 http://www.nytimes.com/2013/08/29/world/asia/taliban-breach-international-base-killing-at-least-6.html
 http://www.nytimes.com/2013/08/29/world/europe/plan-to-tame-french-pension-shortfall-has-few-admirers.html
@@ -6233,7 +6228,6 @@ http://www.nytimes.com/2013/08/29/world/middleeast/putin-on-syria.html
 http://www.nytimes.com/2013/08/29/world/middleeast/syria.html
 http://www.nytimes.com/2013/08/29/world/middleeast/syria-iran-israel.html
 http://www.nytimes.com/2013/08/29/world/middleeast/us-facing-test-on-data-to-back-action-on-syria.html
-http://www.nytimes.com/2013/08/29/world/middleeast/us-facing-test-on-data-to-back-action-on-syria.html,
 http://www.nytimes.com/2013/08/29/world/middleeast/west-scrambles-for-legal-rationale-for-syria-strike.html
 http://www.nytimes.com/2013/08/30/arts/comedy-listings-for-aug-30-sept-5.html
 http://www.nytimes.com/2013/08/30/arts/dance/dance-listings-for-aug-30-sept-5.html
