@@ -28,19 +28,15 @@ def get_author_gender(author_array):
 
 	if len(author_array) > 0:
 		for i in author_array:
-			print i 
 			j = clean_up_whitespace(i)
-			print type(j)
 			prop_male = authorData[authorData['author_name'] == j]['prop_male']
-			print prop_male
-			print min(prop_male)
-			print max(prop_male)
 			if min(prop_male) >= .9:
 				genders += [1.] 
 			elif max(prop_male) <= .1:
 				genders += [0.] 
 			else: 
 				genders += [.5]
+
 	else: 
 		genders += [.5]
 
@@ -51,6 +47,22 @@ def get_author_gender(author_array):
 	else:
 		return 'ambiguous / unknown'
 
+def get_author_popularity(author_array):
+	popularities = []
+
+	if len(author_array) > 0:
+		for i in author_array:
+			j = clean_up_whitespace(i)
+			popularity = authorData[authorData['author_name'] == j]['popularity'].tolist()
+			popularities += popularity
+
+	else: 
+		popularities += [int(authorData['popularity'].median())]
+
+	return sum(popularities) / float(len(popularities))
+
+
 articleData['author_gender'] = articleData.authors.apply(get_author_gender)
+articleData['popularity_pre_log'] = articleData.authors.apply(get_author_popularity)
 
 print articleData
