@@ -3,11 +3,12 @@
 \contentsline {section}{\numberline {2}Data}{2}{section.2}
 \contentsline {subsection}{\numberline {2.1}NYT Internal Web Traffic Data}{2}{subsection.2.1}
 \contentsline {subsection}{\numberline {2.2}Parsed NYT Article Content Data}{2}{subsection.2.2}
-\contentsline {section}{\numberline {3}}{2}{section.3}
-\contentsline {subsection}{\numberline {3.1}Subsection}{2}{subsection.3.1}
-\contentsline {subsubsection}{\numberline {3.1.1}Subsubsection}{2}{subsubsection.3.1.1}
-\contentsline {subsubsection}{\numberline {3.1.2}Subsubsection}{2}{subsubsection.3.1.2}
-\contentsline {subsection}{\numberline {3.2}Subsection}{2}{subsection.3.2}
-\contentsline {section}{Acknowledgments}{2}{section*.3}
-\contentsline {section}{References}{2}{section*.4}
+\contentsline {section}{\numberline {3}Constructed Features}{3}{section.3}
+\contentsline {subsection}{\numberline {3.1}Subsection}{3}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}Subsubsection}{3}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}Subsubsection}{3}{subsubsection.3.1.2}
+\contentsline {subsection}{\numberline {3.2}Subsection}{3}{subsection.3.2}
+\contentsline {section}{\numberline {4}Predictive Regression Model}{3}{section.4}
+\contentsline {section}{Acknowledgments}{3}{section*.8}
+\contentsline {section}{References}{3}{section*.9}
 \contentsfinish 

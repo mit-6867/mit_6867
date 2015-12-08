@@ -68,7 +68,7 @@
 %	ABSTRACT
 %----------------------------------------------------------------------------------------
 
-\Abstract{Why do some webpages receive massive numbers of pageviews? To determine how content drives viewership, we construct a unique dataset of all articles published by the New York Times (NYT) in August 2013. Our dataset is built from 2 major components, the NYT's internal web traffic data and article content data parsed from the NYT website. We use the internal web traffic data to accurately track the number of page views of each article as well as construct a set of robust control variables such as the desk and section of each article. To build content features, we use various machine learning and statistical natural language processing techniques on our parsed article content data and construct features such as article perplexity, sentiment, reading difficulty, and indicators that denote the presence of pictures, videos, etc. Additionally, we have access to the NYT's internal website traffic data. We feed all of our constructed features to into a predictive regression model. We find [MAJOR RESULTS HERE].}
+\Abstract{Why do some webpages receive massive numbers of page views? To determine how content drives viewership, we construct a unique dataset of all articles published by the New York Times (NYT) in August 2013. Our dataset is built from 2 major components, the NYT's internal web traffic data and article content data parsed from the NYT website. We use the internal web traffic data to accurately track the number of page views of each article as well as construct a set of robust control variables such as the desk and section of each article. To build content features, we use various machine learning and statistical natural language processing techniques on our parsed article content data and construct features such as article perplexity, sentiment, reading difficulty, and indicators that denote the presence of pictures, videos, etc. Additionally, we have access to the NYT's internal website traffic data. We feed all of our constructed features to into a predictive regression model. We find [MAJOR RESULTS HERE].}
 
 %----------------------------------------------------------------------------------------
 
@@ -97,11 +97,76 @@ A similar study by Berger and Milkman (2012) \cite{BergerMilkman12} examines the
 
 \section{Data}
 \subsection{NYT Internal Web Traffic Data}
-Our NYT internal web traffic dataset is a record of all individual user activity on the NYT website covering the period of April 3rd, 2013 to October 31st, 2013. This activity data is stored as individual lines of json and includes who (if available) accessed what page at what time. Overall, it is over 20 terabytes in size and contains over 3 billion page views\footnote{Not all page views are article views, for example, some events that are also tracked are searches, or user account settings.} Since the scope of this dataset is so large, we initially restrict this project to a single month, August 2013. 
+Our NYT internal web traffic dataset is a record of all individual user activity on the NYT website covering the period of April 3rd, 2013 to October 31st, 2013. This activity data is stored as individual lines of json and includes who (if available) accessed what page at what time. Overall, it is over 20 terabytes in size and contains over 3 billion page views\footnote{Not all page views are content views, for example, some events that are also tracked are searches, or user account settings.} Since the scope of this dataset is so large, we initially restrict this project to a single month, August 2013. 
 
-Looking at only pages that only contain articles or blogposts, 
+We limit our dataset to consist of pages that only contain articles or blogposts published during the month of August. We parse the data to obtain a list of urls, which need to be stripped of potential garbage. After cleaning up the url data, we are left with 6682 unique pieces of content. We then parse our dataset and aggregate the number of counts each url receives. In order to make the comparison between articles fairer since an article that's been out longer will have more page views on average, we only count the number of page views received up to 7 days after publication\footnote{Given that page views tend to sharply drop off soon after publication since recency is quite important to the News, the number of page views obtained during the 7 days after an article is published represents the vast majority (usually well over 90\%) of total page views an article receives.}. In total, our data consists of over 250 million page views. As seen in Figure 1 below, the distribution of page views is highly skewed with very have tables. After applying a log transformation (as seen in Figure 2), our distribution looks considerably more normal. 
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{pageviews_hist}
+\caption{Histogram of Articles by Number of Page Views}
+\label{fig:pv_hist}
+\end{figure}
+% TWEAK TABLE LOOK
+\begin{table}[hbt]
+\caption{Page Views Distribution Summary Statistics}
+\centering
+\begin{tabular}{rr}
+\toprule
+Total Page Views  &  248161455\\
+\midrule
+Min               &  1\\
+Max               &  2545288\\  
+Mean              &  37138.8\\
+Median            &  10298.5\\
+Std. Dev.         &  88972.9\\
+Skewness          &  9.52191\\
+Kurtosis          &  173.061\\
+\midrule
+Observations &  6682\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{log_pageviews_hist}
+\caption{Histogram of Articles by Log of Page Views}
+\label{fig:lpv_hist}
+\end{figure}
+
+\begin{table}[hbt]
+\caption{Log Page Views Distribution Summary Statistics}
+\centering
+\begin{tabular}{rr}
+\toprule
+Min               &  0\\
+Max               &  14.74975\\  
+Mean              &  9.122868\\
+Median            &  9.239754\\
+Std. Dev.         &  2.028668\\
+Skewness          &  -1.270368\\
+Kurtosis          &  3.800911\\
+\midrule
+Observations &  6682\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+In addition to aggregating the counts, when 
 
 \subsection{Parsed NYT Article Content Data}
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{wordcount_hist}
+\caption{Histogram of Articles by Word Count}
+\label{fig:pv_hist}
+\end{figure}
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{log_wordcount_hist}
+\caption{Histogram of Articles by Log Word Count}
+\label{fig:lpv_hist}
+\end{figure}
 
 %\begin{figure*}[ht]\centering % Using \begin{figure*} makes the figure take up the entire width of the page
 %\includegraphics[width=\linewidth]{view}
@@ -109,18 +174,9 @@ Looking at only pages that only contain articles or blogposts,
 %\label{fig:view}
 %\end{figure*}
 
-
-\begin{figure}[ht]\centering
-\includegraphics[width=\linewidth]{results}
-\caption{In-text Picture}
-\label{fig:results}
-\end{figure}
-
-Reference to Figure \ref{fig:results}.
-
 %------------------------------------------------
 
-\section{}
+\section{Constructed Features}
 
 
 
@@ -164,6 +220,7 @@ Richard & Miles & $2$ \\
 
 \subsection{Subsection}
 
+\section{Predictive Regression Model}
 
 
 %------------------------------------------------
