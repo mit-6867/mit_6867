@@ -1,3 +1,6 @@
+*.bbl
+*.blg
+*.out
 *.pyc
 *.pyc
 *.aux
@@ -8,3 +11,4 @@ Project/text_scraping/article_text/*.txt
 *.csv
 *.tsv
 *.pkl
+*.toc
