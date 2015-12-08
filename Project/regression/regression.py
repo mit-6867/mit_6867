@@ -3,6 +3,7 @@ import pickle
 import numpy as np 
 import random
 import math
+import csv
 
 def create_dummy_variables(df, columns):
     dummies = pd.get_dummies(articleData[columns], prefix=columns)
@@ -141,7 +142,7 @@ for l in [0, .1, 1, 2, 3, 4, 5, 10, 25, 50, 100]:
 
     training_MSES += list(MSE(yPredict, y)[0])
     holdout_MSES += list(MSE(yPredictHoldout, holdout_labels.values)[0])
-    ls += l 
+    ls += [l] 
 
     if MSE(yPredictHoldout, holdout_labels.values) < best_holdout_MSE:
     	best_weights = beta
@@ -155,3 +156,7 @@ print holdout_MSES
 print best_holdout_MSE
 print best_l 
 
+MSE_performance = pd.Series(training_MSES).to_frame(name='training_mse')
+MSE_performance['holdout_mse'] = pd.Series(holdout_MSES)
+MSE_performance['lambdas'] = pd.Series(ls)
+MSE_performance.to_csv('mse_performance.csv', index=False, quotechar='', quoting=csv.QUOTE_NONE, escapechar=' ', sep=',', encoding='utf8')
