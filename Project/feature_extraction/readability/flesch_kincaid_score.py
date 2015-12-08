@@ -6,9 +6,9 @@ import pandas as pd
 
 flesch_kincaid_scores = pd.DataFrame(columns = ('index_value', 'flesch-kincaid_score'))
 
-for i in os.listdir('../text_scraping/article_text'):
+for i in os.listdir('../../text_scraping/article_text'):
 	if i.endswith(".txt"):
-		with open ('../text_scraping/article_text/' + i, "r") as myfile:
+		with open ('../../text_scraping/article_text/' + i, "r") as myfile:
 			data=myfile.read().replace('\n', '')
 			if data != '' and '.' in data:
 				data_append = [{'index_value': i.replace('.txt', ''), 'flesch-kincaid_score': textstat.flesch_reading_ease(data)}]

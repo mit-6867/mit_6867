@@ -15,13 +15,17 @@ def clean_up_whitespace(string):
 
 
 
-articleData = pickle.load(open('articleData.pkl', 'rb'))
-dummyColumns = ['typeOfMaterial', 'desk', 'type', 'section']
-
-articleDataDummies = create_dummy_variables(articleData, dummyColumns)
+articleData = pickle.load(open('articleData-withWords.pkl', 'rb'))
 
 authorData = pd.DataFrame.from_csv('../gender_guessing/authors_with_genders.tsv', sep='\t', index_col=None, encoding='utf-8')
 authorData['author_name'] = authorData.author_name.apply(clean_up_whitespace)
+
+fleschKincaid = pd.DataFrame.from_csv('../feature_extraction/readability/flesch_kincaid.txt', sep=',', index_col=None)
+fleschKincaid['id'] = fleschKincaid['index_value']
+fleschKincaid = fleschKincaid.ix[:, fleschKincaid.columns - ['index_value']]
+
+bigramPerplexity = pickle.load(open('bigram-perplexity.pkl', 'rb'))
+articleData = pd.concat([articleData, bigramPerplexity], axis=1)
 
 def get_author_gender(author_array):
 	genders = []
@@ -65,4 +69,8 @@ def get_author_popularity(author_array):
 articleData['author_gender'] = articleData.authors.apply(get_author_gender)
 articleData['popularity_pre_log'] = articleData.authors.apply(get_author_popularity)
 
-print articleData
+dummyColumns = ['typeOfMaterial', 'desk', 'type', 'section', 'author_gender']
+articleDataDummies = create_dummy_variables(articleData, dummyColumns)
+articleDataDummies = articleDataDummies.merge(fleschKincaid, on=['id'])
+
+print articleDataDummies
