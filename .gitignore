@@ -7,3 +7,4 @@
 Project/text_scraping/article_text/*.txt
 *.csv
 *.tsv
+*.pkl

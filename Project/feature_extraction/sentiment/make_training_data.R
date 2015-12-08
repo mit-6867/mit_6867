@@ -28,4 +28,7 @@ s <- sample(nonempty_articles$index,200)
 sampled_articles <- nonempty_articles[s,]
 
 head(sampled_articles)
-write.csv(sampled_articles,'sample_articles.csv',row.names=FALSE, fileEncoding='utf-8')
+sampled_articles %>%
+  mutate(text = str_replace_all(text, ',', '')) -> sampled_articles
+
+write.csv(dplyr::select(sampled_articles, text),'sample_articles.csv',row.names=FALSE, fileEncoding='utf-8', quote=FALSE)

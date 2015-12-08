@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import csv
+import pickle
 
 def get_popularity(author):
 	print author
@@ -15,7 +16,7 @@ def get_popularity(author):
 	
 	soup = BeautifulSoup(r.text, "html.parser")
 	raw_results_text = soup.find('div',{'id':'b_tween'}).text
-	time.sleep(30)
+	time.sleep(20)
 	return [int(raw_results_text.split()[0].replace(',', ''))]
 	
 def remove_quotes(string):
@@ -29,11 +30,13 @@ unique_authors = set(authors)
 authors_df = pandas.DataFrame(list(unique_authors), columns = ['author_name'])
 authors_df['author_name'] = authors_df.author_name.apply(remove_quotes)
 authors_df['author_name'] = authors_df.author_name.apply(remove_quotes)
-authors_df.to_csv('author_list.tsv', index=False, encoding='utf-8', quotechar='', quoting=csv.QUOTE_NONE, escapechar=' ', sep='\t')
-
-authors_df = pandas.read_csv('author_list.tsv', sep='\t')
 
 popularities = []
-for i in authors_df['author_name']:
-	popularities += get_popularity(i)
+popularities = pickle.load(open('popularities.pkl', 'rb'))
+for i in range(len(popularities), len(authors_df['author_name'])):
+	popularities += get_popularity(authors_df['author_name'][i])
+	pickle.dump(popularities, open('popularities.pkl', 'wb'))
 	print popularities
+
+authors_df['popularity'] = pandas.Series(popularities)
+authors_df.to_csv('author_list.tsv', index=False, quotechar='', quoting=csv.QUOTE_NONE, escapechar=' ', sep='\t', encoding='utf8')
