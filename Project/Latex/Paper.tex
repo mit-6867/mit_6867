@@ -206,11 +206,41 @@ We also include features that attempt to capture the article sentiment and the a
 
 \subsection{Article Sentiment}
 
-\subsubsection{Article Perplexity}
+\subsection{Article Perplexity}
 
 \section{Predictive Regression Model}
 
+\begin{figure*}[ht]\centering
+\includegraphics[width=\linewidth]{feature_weights.png}
+\caption{Linear Regression Feature Weights (excluding intercept term)}
+\label{fig:lin_reg_weights}
+\end{figure*}
 
+\begin{tabular}{lr}
+\toprule
+Feature  &  Weight\\
+\midrule
+intercept & 9.047\\
+log\_wcount & 0.729\\
+desk\_Foreign & 0.657\\
+section\_World & -0.553\\
+desk\_Travel & -0.472\\
+typeOfMaterial\_Schedule & -0.291\\
+section\_Movies & -0.277\\
+section\_Opinion & 0.261\\
+typeOfMaterial\_Review & -0.255\\
+desk\_National & 0.253\\
+typeOfMaterial\_Letter & -0.243\\
+section\_Sports & -0.215\\
+section\_Education & -0.199\\
+section\_Books & 0.192\\
+section\_Corrections & -0.179\\
+desk\_Weekend & -0.175\\
+section\_Health & 0.172\\
+type\_BlogPost & -0.170\\
+desk\_BookReview & -0.169\\
+typeOfMaterial\_Op-Ed & 0.167\\
+\end{tabular}
 %------------------------------------------------
 \phantomsection
 \section*{Acknowledgments} % The \section*{} command stops section numbering

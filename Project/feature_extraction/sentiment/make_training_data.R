@@ -22,13 +22,13 @@ for (i in 1:7368){
 
 write.csv(text,'articles.csv',row.names=FALSE)
 
-nonempty_articles <- filter(text,text!='')
+nonempty_articles <- filter(text,text !='' & text!= 'NA' & !is.na(text))
 set.seed(111)
 s <- sample(nonempty_articles$index,200)
 sampled_articles <- nonempty_articles[s,]
 
-head(sampled_articles)
 sampled_articles %>%
-  mutate(text = str_replace_all(text, ',', '')) -> sampled_articles
+  mutate(text = str_replace_all(str_replace_all(str_replace_all(text, ',', ''), '\"', '”'), '\u0096', '')) -> sampled_articles
 
 write.csv(dplyr::select(sampled_articles, text),'sample_articles.csv',row.names=FALSE, fileEncoding='utf-8', quote=FALSE)
+write.csv(sampled_articles,'sample_articles_with_indices.csv',row.names=FALSE, fileEncoding='utf-8', quote=FALSE)
