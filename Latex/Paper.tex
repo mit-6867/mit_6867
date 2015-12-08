@@ -20,7 +20,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[fleqn,10pt]{SelfArx} % Document font size and equations flushed left
+\documentclass[fleqn,12pt]{SelfArx} % Document font size and equations flushed left
 
 \usepackage[english]{babel} % Specify a different language here - english by default
 
@@ -88,18 +88,19 @@
 
 \section{Introduction} % The \section*{} command stops section numbering
 
-In today's digital economy, many companies are very interested in attracting users to visit their websites in order to earn ad revenue. While many factors might motivate a user to visit a particular page, certainly one important factor is the content in that webpage. This paper in explores the relationship between the content of a webpage and the number of page views it ultimately ends up receiving by constructing a unique dataset of all articles published by the New York Times (NYT) during August 2013. This dataset is built from two major components: the NYT's internal web traffic data and parsed NYT article content data.
+In today's digital economy, many companies are very interested in attracting users to visit their websites in order to earn ad revenue. While many factors might motivate a user to visit a particular page, certainly one important factor is the content in that webpage. This paper explores the relationship between the content of a webpage and the number of page views it ultimately ends up receiving by constructing a unique dataset of all articles published by the New York Times (NYT) during August 2013. This dataset is built from two major components: the NYT's internal web traffic data and parsed NYT article content data.
 
-Typically, a study such as ours tends to be very difficult to conduct as either accurate measures of viewership are unavailable\footnote{While oftentimes precise viewership data tends to be not available openly, oftentimes researchers use related observables, such as Facebook likes}or the feature extraction of the content is too challenging (for example Youtube), or or both. Fortunately, our access the the NYT's internal web traffic data which allows us to exactly measure the number of page views an article receives. The web traffic data is rather rich and also includes internal meta-data that we use to build various control features. Moreover, since we are working with mostly textual data, we are able to take advantage of recent advancements in machine learning and statistical NLP to do feature extraction on article text. 
+Typically, a study such as ours tends to be very difficult to conduct as either accurate measures of viewership are unavailable\footnote{While oftentimes precise viewership data tends to be not available openly, oftentimes researchers use related observables, such as Facebook likes} or the feature extraction of the content is too challenging (for example Youtube), or or both. Fortunately, our access to the the NYT's internal web traffic data allows us to exactly measure the number of page views an article receives. The web traffic data is rather rich and also includes internal meta-data that we use to build various control features. Moreover, since we are working with mostly textual data, we are able to take advantage of recent advancements in machine learning and statistical NLP to do feature extraction on article text. 
 
-A similar study by Berger and Milkman (2012) \cite{BergerMilkman12} examines the relationship between content and word-of-mouth virality. They find that the emotional content of a NYT article could predict its virality. Using simple measures of an article's sentiment and emotionality, Berger and Milkman show that positive articles are more likely to show up on the New York Times "Most-Emailed" list. They also show that articles that evoke high physiological positive or negative arousal (such as awe or anger) tend to be more viral than articles that evoke deactivating emotions (sadness). We build on this study in two ways: first, we relate an article's content back to the number of page views it receives rather than its virality\footnote{Which companies arguably care more about since word-of-mouth virality is usually a means to increase page views}. Second, we employ more sophisticated machine learning feature extraction techniques to see if they work any better over their simple measures.
+A similar study by Berger and Milkman (2012) \cite{BergerMilkman12} examines the relationship between content and word-of-mouth virality. They find that the emotional content of a NYT article is predictive of its virality. Using simple measures of an article's sentiment and emotionality, Berger and Milkman show that positive articles are more likely to show up on the New York Times "Most-Emailed" list. They also show that articles that evoke high physiological positive or negative arousal (such as awe or anger) tend to be more viral than articles that evoke deactivating emotions (sadness). We build on this study in two ways: first, we relate an article's content back to the number of page views it receives rather than its virality\footnote{Which companies arguably care more about since word-of-mouth virality is usually a means to increase page views}. Second, we employ more sophisticated machine learning feature extraction techniques to see if they work any better over their simple measures.
 %------------------------------------------------
 
 \section{Data}
 \subsection{NYT Internal Web Traffic Data}
 Our NYT internal web traffic dataset is a record of all individual user activity on the NYT website covering the period of April 3rd, 2013 to October 31st, 2013. This activity data is stored as individual lines of json and includes who (if available) accessed what page at what time. Overall, it is over 20 terabytes in size and contains over 3 billion page views\footnote{Not all page views are article views, for example, some events that are also tracked are searches, or user account settings.} Since the scope of this dataset is so large, we initially restrict this project to a single month, August 2013. 
 
-We first parse this data to determine a unique list of articles published during our time period. 
+Looking at only pages that only contain articles or blogposts, 
+
 \subsection{Parsed NYT Article Content Data}
 
 %\begin{figure*}[ht]\centering % Using \begin{figure*} makes the figure take up the entire width of the page
@@ -119,13 +120,12 @@ Reference to Figure \ref{fig:results}.
 
 %------------------------------------------------
 
-\section{Results and Discussion}
+\section{}
 
-\lipsum[10] % Dummy text
+
 
 \subsection{Subsection}
 
-\lipsum[11] % Dummy text
 
 \begin{table}[hbt]
 \caption{Table of Grades}
@@ -143,9 +143,7 @@ Richard & Miles & $2$ \\
 \label{tab:label}
 \end{table}
 
-\subsubsection{Subsubsection}
 
-\lipsum[12] % Dummy text
 
 \begin{description}
 \item[Word] Definition
@@ -155,7 +153,6 @@ Richard & Miles & $2$ \\
 
 \subsubsection{Subsubsection}
 
-\lipsum[13] % Dummy text
 
 \begin{itemize}[noitemsep] % [noitemsep] removes whitespace between the items for a compact look
 \item First item in a list
@@ -165,11 +162,9 @@ Richard & Miles & $2$ \\
 
 \subsubsection{Subsubsection}
 
-\lipsum[14] % Dummy text
-
 \subsection{Subsection}
 
-\lipsum[15-23] % Dummy text
+
 
 %------------------------------------------------
 \phantomsection
