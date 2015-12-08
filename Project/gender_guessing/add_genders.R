@@ -25,5 +25,5 @@ authors$prop_female <- apply(authors, 1, FUN=female_prop_for_df)
 authors$prop_male <- as.numeric(authors$prop_male)
 authors$prop_female <- as.numeric(authors$prop_female)
 
-write.csv(authors, file='authors_with_genders.csv')
-
+write.table(authors, file='authors_with_genders.tsv', row.names=FALSE, sep="\t", 
+            quote=FALSE, fileEncoding='UTF-8')
