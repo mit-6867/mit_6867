@@ -133,7 +133,7 @@ ls = []
 
 for l in [0, .1, 1, 2, 3, 4, 5, 10, 25, 50, 100]:
     XtX = np.dot(np.transpose(X), X) + l*np.identity(X.shape[1])
-    XtXinv = np.linalg.pinv(XtX)
+    XtXinv = np.linalg.inv(XtX)
 
     beta = np.dot(np.dot(XtXinv, np.transpose(X)), y)
 
