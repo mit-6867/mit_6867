@@ -4,6 +4,8 @@ import numpy as np
 import random
 import math
 import csv
+import datetime
+from pytz import timezone
 
 def create_dummy_variables(df, columns):
     dummies = pd.get_dummies(articleData[columns], prefix=columns)
@@ -14,9 +16,22 @@ def create_dummy_variables(df, columns):
 def clean_up_whitespace(string):
     while '  ' in string:
         string = string.replace('  ', ' ')
-    return string    .encode('utf-8', 'ignore')
+    return string.encode('utf-8', 'ignore')
 
+def get_weekday(time_stamp):
+    return datetime.datetime.fromtimestamp(int(time_stamp/1000), tz=timezone('UTC')).strftime('%A')
 
+def get_hour_chunk(time_stamp):
+    utc = datetime.datetime.fromtimestamp(int(time_stamp/1000), tz=timezone('UTC'))
+    hour = int(utc.astimezone(timezone('US/Eastern')).strftime('%H'))
+    if hour < 6:
+        return '0-5'
+    elif hour < 12:
+        return '6-11'
+    elif hour < 18:
+        return '12-17'
+    else:
+        return '18-23'
 
 articleData = pickle.load(open('articleData-withWords.pkl', 'rb'))
 
@@ -87,8 +102,10 @@ def scale_features(array):
 
 articleData['author_gender'] = articleData.authors.apply(get_author_gender)
 articleData['popularity_pre_log'] = articleData.authors.apply(get_author_popularity)
+articleData['weekday'] = articleData.publishedDate.apply(get_weekday)
+articleData['timeofday'] = articleData.publishedDate.apply(get_hour_chunk)
 
-dummyColumns = ['typeOfMaterial', 'desk', 'type', 'section', 'author_gender']
+dummyColumns = ['typeOfMaterial', 'desk', 'type', 'section', 'author_gender', 'weekday', 'timeofday']
 articleDataDummies = create_dummy_variables(articleData, dummyColumns)
 articleDataDummies = articleDataDummies.merge(fleschKincaid, on=['id'])
 articleDataDummies['flesch-kincaid_score'].fillna(articleDataDummies['flesch-kincaid_score'].median(), inplace=True)
@@ -99,7 +116,7 @@ articleDataDummies['log_wcount'] = articleDataDummies.wcount.apply(np.log)
 
 columnstoRemove = ['authors', 'desFacet', 'geoFacet', 'headline', 'id', 'orgFacet', 'perFacet', 'publishedDate', 
 'count', 'popularity_pre_log', 'log_count', 'author_gender_male', 'desk_Business', 'section_Arts', 'type_Article', 
-'typeOfMaterial_Interview', 'wcount']
+'typeOfMaterial_Interview', 'wcount', 'weekday_Friday', 'timeofday_0-5']
 articleDataDummiesRegression = articleDataDummies.ix[:, articleDataDummies.columns - columnstoRemove]
 intercept = pd.Series(np.ones(len(articleDataDummiesRegression)))
 articleDataDummiesRegression = articleDataDummiesRegression.apply(scale_features, axis=0)
@@ -133,7 +150,7 @@ ls = []
 
 for l in [0, .1, 1, 2, 3, 4, 5, 10, 25, 50, 100]:
     XtX = np.dot(np.transpose(X), X) + l*np.identity(X.shape[1])
-    XtXinv = np.linalg.inv(XtX)
+    XtXinv = np.linalg.pinv(XtX)
 
     beta = np.dot(np.dot(XtXinv, np.transpose(X)), y)
 
