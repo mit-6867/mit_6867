@@ -22,7 +22,7 @@ def get_popularity(author):
 def remove_quotes(string):
 	return string.replace('"', '')
 
-df = pandas.read_pickle('/Users/dholtz/Downloads/articleData.pkl')
+df = pandas.read_pickle('/Users/dholtz/Downloads/articleData-withWords.pkl')
 
 authors = list(itertools.chain(*df['authors']))
 unique_authors = set(authors)
