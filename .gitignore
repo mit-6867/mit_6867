@@ -1,3 +1,4 @@
+*.Rhistory
 *.bbl
 *.blg
 *.out
