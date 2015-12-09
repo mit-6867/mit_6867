@@ -199,6 +199,24 @@ In preparing to perform our regression, we construct a number of features, using
 	We construct our gender data by cross-referencing the first names of all of the authors in our dataset against U.S. Social Security Administration baby name data from 1935 to 1997. If over 90\% of the babies with a given name have been male, we assume a given author is male. If over 90\% of the babies with a given name have been female, we assume a given author is female. Otherwise, we record ``ambiguous / unknown."
 	
 	\item[Material Type, Section, Desk, and Article Type] We also include dummy variables including the material type (e.g., `News' or `Obituary'), desk (e.g., `Weekend' or `Real Estate'), article type (`Blog post' or `Article'), and section (e.g., `Movies' or `World').
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{author_popularity_histogram.png}
+\caption{Histogram of Bing Search Results}
+\label{fig:ap_hist}
+\end{figure}
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{author_popularity_log_histogram.png}
+\caption{Histogram of log(Bing Search Results)}
+\label{fig:apl_hist}
+\end{figure}
+	
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{flesch_data_histogram.png}
+\caption{Histogram of Flesch Reading Ease}
+\label{fig:fre_hist}
+\end{figure}	
 	
 \end{description}
 
@@ -227,26 +245,26 @@ We also include features that attempt to capture the article sentiment and the a
 \toprule
 Feature  &  Weight\\
 \midrule
-intercept & 9.047\\
-log\_wcount & 0.729\\
-desk\_Foreign & 0.657\\
-section\_World & -0.553\\
-desk\_Travel & -0.472\\
-typeOfMaterial\_Schedule & -0.291\\
-section\_Movies & -0.277\\
-section\_Opinion & 0.261\\
-typeOfMaterial\_Review & -0.255\\
-desk\_National & 0.253\\
-typeOfMaterial\_Letter & -0.243\\
-section\_Sports & -0.215\\
-section\_Education & -0.199\\
-section\_Books & 0.192\\
-section\_Corrections & -0.179\\
-desk\_Weekend & -0.175\\
-section\_Health & 0.172\\
-type\_BlogPost & -0.170\\
-desk\_BookReview & -0.169\\
-typeOfMaterial\_Op-Ed & 0.167\\
+intercept & 9.114\\
+log(Word Count) & 0.736\\
+Desk: Foreign & 0.561\\
+Desk: Travel & -0.478\\
+Section: World & -0.410\\
+Type: BlogPost & -0.394\\
+Type of Material: Schedule & -0.330\\
+Type of Material: Review & -0.324\\
+Type of Material: Letter & -0.311\\
+Section: Fashion \& Style & 0.275\\
+Section: Movies & -0.267\\
+Desk: National & 0.245\\
+Section: Opinion & 0.245\\
+Time of Day: 12-17 & 0.239\\
+Section: Books & 0.219\\
+Section: Health & 0.200\\
+Section: Sports & -0.191\\
+Desk: Society & -0.178\\
+Section: Corrections & -0.167\\
+Desk: BookReview & -0.167\\
 \end{tabular}
 \end{center}
 %------------------------------------------------
