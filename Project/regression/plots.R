@@ -30,12 +30,12 @@ linear_regression_weights %>%
 ggplot(filter(linear_regression_weights[1:53,], names!='intercept'), aes(x=names, y=weights)) + 
   geom_bar(stat="identity", position="dodge") + theme(axis.text.x=element_text(angle=90, size=10)) + 
   xlab('Feature') + ylab('Feature Weight') + ggtitle('Linear Regression Feature Weights') -> p
-ggsave(p, file='feature_weights.png')
+ggsave(p, file='feature_weights.png', height = 7)
 
 ggplot(filter(linear_regression_weights[54:103,], names!='intercept'), aes(x=names, y=weights)) + 
   geom_bar(stat="identity", position="dodge") + theme(axis.text.x=element_text(angle=90, size=10)) + 
   xlab('Feature') + ylab('Feature Weight') + ggtitle('Linear Regression Feature Weights') -> pcont
-ggsave(pcont, file='feature_weights_contd.png')
+ggsave(pcont, file='feature_weights_contd.png', height = 7)
 
 linear_regression_weights %>%
   arrange(desc(abs(weights))) %>%
@@ -55,7 +55,7 @@ mse_performance %>%
   xlab('Regularization Parameter') + ylab('MSE') + 
   ggtitle('Effect of Regularization on MSE') -> p2
 
-ggsave(p2, file='mse_plot.png', width = 8, height = 6)
+ggsave(p2, file='mse_plot.png')
 
 author_data <- read.delim('../gender_guessing/authors_with_genders.tsv', sep='\t')
 
@@ -79,9 +79,35 @@ bigram_plot <- read.csv('../regression/bigram_plot_df.csv')
 
 bigram_plot %>% 
   mutate(value = -value) %>%
-ggplot(., aes(x=alpha, y=value, color=variable)) + geom_line() + 
+ggplot(., aes(x=alpha, y=value, color=variable)) + geom_line(size=1) + 
   xlab('Alpha') + ylab('Average log likelihood per word') + 
   theme(legend.position='bottom') -> p6
 ggsave(p6, file='bigram_plot_df.png')
 
 naive_bayes <- read.csv('../feature_extraction/sentiment/naive_bayes_merged.csv')
+table(naive_bayes$naive_bayes, naive_bayes$naive_bayes_nltk) %>% kable(., format='latex')
+
+perplexity <- read.csv('../regression/trigram_perplexity.csv')
+perplexity_bi <- read.csv('../regression/bigram_perplexity.csv')
+
+perplexity$type = 'Trigram Perplexity'
+perplexity_bi$type = 'Bigram Perplexity'
+
+perplexity_total = rbind(perplexity, perplexity_bi)
+
+ggplot(perplexity_total, aes(x=perplexity, fill=type)) + 
+  geom_histogram(alpha=.4, position="identity") + 
+  scale_x_continuous(labels=comma, lim=c(0, 200)) + 
+  xlab('Perplexity') + ylab('count') -> p7
+ggsave(p7, file='perplexity.png')
+
+nndev <- read.csv('../regression/nndev.csv')
+
+nndev %>%
+  mutate(Model = variable) %>%
+  mutate(Model = ifelse(Model=='BigramNN-Dev', 
+                'Bigram Neural Network', 'Trigram Neural Network'),
+         value = -value) %>%
+  ggplot(., aes(x=epoch, y=value, color=Model)) + geom_line(size=1) + 
+  theme(legend.position='bottom') + ylab('NALL')-> p8
+ggsave(p8, file='nall.png')
