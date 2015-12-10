@@ -27,16 +27,21 @@ linear_regression_weights %>%
     'log_wcount', 'log(Word Count)'), 'log_popularity', 'log(Popularity)'), 'sentiment_', 'Sentiment: ')
     ) -> linear_regression_weights
 
-ggplot(filter(linear_regression_weights, names!='intercept'), aes(x=names, y=weights)) + 
-  geom_bar(stat="identity", position="dodge") + theme(axis.text.x=element_text(angle=90, size=5)) + 
+ggplot(filter(linear_regression_weights[1:53,], names!='intercept'), aes(x=names, y=weights)) + 
+  geom_bar(stat="identity", position="dodge") + theme(axis.text.x=element_text(angle=90, size=10)) + 
   xlab('Feature') + ylab('Feature Weight') + ggtitle('Linear Regression Feature Weights') -> p
 ggsave(p, file='feature_weights.png')
+
+ggplot(filter(linear_regression_weights[54:103,], names!='intercept'), aes(x=names, y=weights)) + 
+  geom_bar(stat="identity", position="dodge") + theme(axis.text.x=element_text(angle=90, size=10)) + 
+  xlab('Feature') + ylab('Feature Weight') + ggtitle('Linear Regression Feature Weights') -> pcont
+ggsave(pcont, file='feature_weights_contd.png')
 
 linear_regression_weights %>%
   arrange(desc(abs(weights))) %>%
   mutate(weights = round(weights, 3)) %>%
   dplyr::select(names, weights) %>%
-  head(n=50) %>%
+  head(n=20) %>%
   kable(., format='latex')
 
 mse_performance <- read.csv('~/Desktop/mit_6867/Project/regression/mse_performance.csv')
@@ -50,7 +55,7 @@ mse_performance %>%
   xlab('Regularization Parameter') + ylab('MSE') + 
   ggtitle('Effect of Regularization on MSE') -> p2
 
-ggsave(p2, file='mse_plot.png')
+ggsave(p2, file='mse_plot.png', width = 8, height = 6)
 
 author_data <- read.delim('../gender_guessing/authors_with_genders.tsv', sep='\t')
 
