@@ -260,17 +260,21 @@ In order to determine the perplexity score, we first need to build some language
 \begin{equation}
 	2^{-n\cdot\sum_{i=1}^n \log p(w_i)}
 \end{equation}
-where $n$ is the length of the article, and $p(w_i)$ is the probability of the $i$-th word in the article. As for out paper, we consider a couple of choices for our language model. First, we build a simple bi-gram language to establish a baseline. We also build more sophisticated word vector based n-gram neural network language models.
+where $n$ is the length of the article, and $p(w_i)$ is the probability of the $i$-th word in the article. We think that perplexity might have some predictive power since people generally have a preference for novelty. If many news articles about the same story are all using highly similar language, an article that covers the story using atypical language is likely unique in some way or another which may drive people to read it more or less.
 
-We split our articles into training (~70\%), validation (~15\%), and test sets (~15\%). We build our corpus only from the text of the articles in the training dataset. To build our bigram model, we simply need to compute the counts in our training corpus. Specifically, the probability of some word $w_i$ conditional on its preceding word $w_{i-1}$ is given by:
+As for out paper, we consider a couple of choices for our language model. First, we build a simple bi-gram language to establish a baseline. We also build more sophisticated word vector based n-gram neural network language models.
+
+We split our articles into training (~70\%), validation (~15\%), and test sets (~15\%). We build our language model corpus only from the text of the articles in the training dataset. To estimate a bigram model, we simply need to compute the counts in our training corpus. Specifically, the probability of some word $w_i$ conditional on its preceding word $w_{i-1}$ is given by:
 \begin{equation}
 p(w_i|w_{i-1}) = \frac{\textnormal{count}(w_{i-1},w_i)}{\textnormal{count}}
 \end{equation}
-However, its reasonable to expect that there might be bigrams in the development or test corpora that aren't observed in the training corpus. If this is the case, then any article with an unobserved bigram would be assigned a predicted likelihood of 0. Needless to say, this is very bad. In order to avoid this issue, we apply a technique called add-$\alpha$ smoothing. Essentially what add-$\alpha$ smoothing does is it adds counts to every single possible bigram so that no bigram, given a fixed vocabulary $V$, will ever have 0 probability. This changes our our word probabilities to:
+However, its reasonable to expect that there might be bigrams in the development or test corpora that aren't observed in the training corpus. If this is the case, then any article with an unobserved bigram would be assigned a predicted likelihood of 0. Needless to say, this is very bad. In order to avoid this issue, we apply a technique called add-$\alpha$ smoothing. Essentially what add-$\alpha$ smoothing does is it adds (possibly fractional) counts to every single possible bigram. After smoothing, no bigram, given a fixed vocabulary $V$, will ever have 0 probability. This changes our our estimated word probabilities to:
 \begin{equation}
 p(w_i|w_{i-1}) = \frac{\textnormal{count}(w_{i-1},w_i) + \alpha}{\textnormal{count} + \alpha |V|}
 \end{equation}
-where $|V|$ is the size of the vocabulary. In the bigram case, we can consider that words follow a multinomial distribution conditional on its preceding word. Essentially, what's happening here is we're applying a symmetric dirichlet prior with parameter $\alpha$ to each of these multinomial distributions. 
+where $|V|$ is the size of the vocabulary. This smoothing actually has quite a nice Bayesian interpretation as well. In the bigram case, we can say that words follow a multinomial distribution conditional on its preceding word. The smoothed language model 
+
+Essentially, is we're applying a symmetric dirichlet prior with parameter $\alpha$ to each of these multinomial distributions. 
 
 We use our validation set to determine the optimal value of of $\alpha$ by seeing what value of $\alpha$ minimizes the negative average log-likelihood per word (NALL) of our validation corpus:
 \begin{figure}[ht]\centering
@@ -379,7 +383,7 @@ Desk: BookReview & -0.167\\
 
 Given the large amount of work we put into building numerous text-based features (such as the trigram neural network perplexity, the sentiment, and the Flesch reading ease), we may want to evaluate how impactful these various features actually are in our regression. How much incremental reduction in MSE are we getting by including them? We first re-run the exact same regression specification, but instead of using the trigram perplexity calculated from our neural network, we instead use the simple bigram perplexity discussed earlier in this paper. We find that this actually causes the MSE to decrease, from 2.392 to 2.389. This small, but modest change suggests that there is almost no incremental value from the neural network feature.
 
-Now, we might ask if any text features are adding much value. Particularly given that, in general, their magnitude is dwarved by the magnitudes of the contextual features when looking at feature weights, we might expect that text features do not add much. When removing perplexity, sentiment, reading ease, and word count features from our regression, we find that the MSE increases, from 2.392 to 2.502. This is result is encouraging, as it suggests that even if text features aren't doing much, they're doing something! Removing them from our model leads to a 4.6\% increase in the MSE.
+Now, we might ask if any text features are adding much value. Particularly given that, in general, their magnitude is dwarfed by the magnitudes of the contextual features when looking at feature weights, we might expect that text features do not add much. When removing perplexity, sentiment, reading ease, and word count features from our regression, we find that the MSE increases, from 2.392 to 2.502. This is result is encouraging, as it suggests that even if text features aren't doing much, they're doing something! Removing them from our model leads to a 4.6\% increase in the MSE.
 
 \begin{table}[hbt]
 \caption{Comparison of MSEs for different model specifications}
@@ -393,6 +397,14 @@ NN Trigram & Bigram & No Text\\
 \end{tabular}
 \end{table}
 
+\section{Future Work}
+Unfortunately due to time constraints as well as various unanticipated difficulties and technical errors, we were unable to implement all of several important features we had initially wanted to include in our regression. Most notably, this paper in its current state lacks some form of topic modeling which we expect to be a strong predictor of content viewership at least in our context. 
+
+There is also much room for improvement with our existing features as well. For example, the perplexity score feature ended providing very little predictive power might be a result of the underlying language model not being good enough, especially considering that the neural network model still hasn't completed its training. Though we did observe that there was virtually no difference moving from the bigram perplexity scores to the trigram neural network perplexity scores, this again might be because the neural network wasn't given sufficient time to train. We can imagine that if we continued training our neural network for several more cycles, we might start to see visible performance gains. 
+
+Similarly, the sentiment analysis has much room for improvement...
+
+Certainly one thing we definitely plan on doing if we end up trying to turn this project into a publishable paper is to include all of the articles in our dataset. With the much greater sample size and the much more expansive corpus from the additional articles, we might expect to see drastically different 
 %------------------------------------------------
 \phantomsection
 \section*{Acknowledgments} % The \section*{} command stops section numbering
