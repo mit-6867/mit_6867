@@ -225,6 +225,56 @@ We also include features that attempt to capture the article sentiment and the a
 \subsection{Article Sentiment}
 
 \subsection{Article Perplexity}
+In order to determine the perplexity score, we first need to build some language model that gives us the probabilities of each word. While perplexity typically is a measure of how well a probability distribution can predict a sample, in our context, we interpret perplexity essentially as a measure of article “uniqueness”. The argument here is that if our language model can’t predict the language used in article very well, then the language used in the article is atypical relative to the corpus used to build the language model. Hence, given some language model, an article's perplexity is given by:
+\begin{equation}
+	2^{-n\cdot\sum_{i=1}^n \log p(w_i)}
+\end{equation}
+where $n$ is the length of the article, and $p(w_i)$ is the probability of the $i$-th word in the article. As for out paper, we consider a couple of choices for our language model. First, we build a simple bi-gram language to establish a baseline. We also build more sophisticated word vector based n-gram neural network language models.
+
+We split our articles into training (~70\%), validation (~15\%), and test sets (~15\%). We build our corpus only from the text of the articles in the training dataset. To build our bigram model, we simply need to compute the counts in our training corpus. Specifically, the probability of some word $w_i$ conditional on its preceding word $w_{i-1}$ is given by:
+\begin{equation}
+p(w_i|w_{i-1}) = \frac{\textnormal{count}(w_{i-1},w_i)}{\textnormal{count}}
+\end{equation}
+However, its reasonable to expect that there might be bigrams in the development or test corpora that aren't observed in the training corpus. If this is the case, then any article with an unobserved bigram would be assigned a predicted likelihood of 0. Needless to say, this is very bad. In order to avoid this issue, we apply a technique called add-$\alpha$ smoothing. Essentially what add-$\alpha$ smoothing does is it adds counts to every single possible bigram so that no bigram, given a fixed vocabulary $V$, will ever have 0 probability. This changes our our word probabilities to:
+\begin{equation}
+p(w_i|w_{i-1}) = \frac{\textnormal{count}(w_{i-1},w_i) + \alpha}{\textnormal{count} + \alpha |V|}
+\end{equation}
+where $|V|$ is the size of the vocabulary. In the bigram case, we can consider that words follow a multinomial distribution conditional on its preceding word. Essentially, what's happening here is we're applying a symmetric dirichlet prior with parameter $\alpha$ to each of these multinomial distributions. 
+
+We use our validation set to determine the optimal value of of $\alpha$ by seeing what value of $\alpha$ minimizes the negative average log-likelihood per word (NALL) of our validation corpus:
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{bigram_add_a.png}
+\caption{Average Negative Log-Likelihood per Word as a Function of $\alpha$}
+\label{fig:fre_hist}
+\end{figure}
+Here we see exactly what we should expect. The NALL on the training corpus is lower than the NALL on the validation corpus. Furthermore, the NALL on our training corpus monotonically increases as we increase $alpha$ while the NALL on the validation corpus initially decreases hits a minimum, and starts to increase. For our language model, the optimal $\alpha$ is 0.004. This produces the following NALLs for our 3 corpora:
+
+\begin{table}[hbt]
+\caption{NALL for Bigram Language Model with Smoothing}
+\centering
+\begin{tabular}{ccc}
+\toprule
+Training &  Validation & Test\\
+\midrule
+4.98487 & 6.42916 &  6.41888\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+One criticism of standard n-gram language models is that they are rather sensitive to the training data. Suppose that two words generally have fairly interchangeable use cases (meaning that the same or similar words tend to appear before these words), for example, ``coffee" and ``tea". Further suppose that for whatever reason, the phrase ``drink coffee" is predominantly featured in the training data but ``drink tea" is not. Then a standard bigram language model would assign a very low probability to ``drink tea" even if the in the training data contains many instances in which they are fairly interchangeable (``buy coffee/tea", ``brew coffee/tea", etc.).
+
+Hence, we build word vector n-gram neural network models to see if we can achieve better performance. By using dense word vectors rather than one-hot encodings to represent words, we're able to more accurately represent the ``similarity" of words. For example, ``coffee" is more similar to ``tea" that it is to ``car". Rather astonishingly, these word vector values can be trained through back propagation just like the weights in a neural network just as long as they're randomly initiated! 
+
+ In particular, we train both a bigram neural network language model and a trigram neural network language model. In both cases, we use word vectors of length 10 (for the bigram NN, our input layer is size 10 and for the trigram NN, the input layer is size 20) that map to a single hidden layer with 10 hidden units with a tanh activation function. The hidden layer is then connected to the output layer which is the size of our vocabulary with a softmax activation function. Given that we want to also train our word vectors, we use stochastic adaptive gradient descent. We purposefully keep our network relatively small since our data set is rather large and training even this small neural network takes considerable time. 
+ 
+ Unfortunately, our neural networks are still in the process of training. Due to various complications, we were not able to train our model for as long as we would've liked. Couple this with the fact that our training corpus contains over 3,000,000 observations and each complete pass through it takes approximately 4.5 hours, means that as of writing this paper, we've only completed 4 full passes. However, our neural network is working as intended and with each pass through the training data, we see decreasing NALL:
+ 
+ %% GRAPH AND TABLE HERE
+ 
+Despite the fact that our training isn't finished, both our neural network-based language models are already performing better than a standard bi-gram model with smoothing. To build our article perplexity scores, we use the most recently completed pass of our trigram NN language models.
+
+Its important to note however, that we don't necessarily care exactly how good our language model is since we are the language model is an intermediate step to construct a feature for a regression task. It could very well be the case features generated by a worse language model can work just as well as features generated from a better language model if the relative variation of articles is maintained. To test whether a better language model can give us more predictive power, we compute two sets of perplexity scores, one based on the smoothed bigram language model and one based on the trigram neural network language model. 
+
 
 \section{Predictive Regression Model}
 
