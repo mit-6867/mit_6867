@@ -168,6 +168,7 @@ validation_MSES = []
 test_MSES = []
 best_weights = []
 best_validation_MSE = 100000
+best_training_MSE = 100000
 best_l = 0
 ls = []
 
@@ -192,6 +193,7 @@ for l in [0, .1, 1, 2, 3, 4, 5, 10, 25, 50, 100]:
     	best_weights = beta
     	best_l = l
     	best_validation_MSE = MSE(yPredictValidation, validation_labels.values)
+        best_training_MSE = MSE(yPredict, y)
 
 print ', '.join(str(v) for v in best_weights)
 print '", "'.join(str(v) for v in articleDataDummiesRegression.columns.values)
@@ -199,6 +201,7 @@ print training_MSES
 print validation_MSES
 print test_MSES 
 print best_validation_MSE
+print best_training_MSE
 print best_l 
 
 MSE_performance = pd.Series(training_MSES).to_frame(name='training_mse')
@@ -249,6 +252,7 @@ validation_MSES = []
 test_MSES = []
 best_weights = []
 best_validation_MSE = 100000
+best_training_MSE = 100000
 best_l = 0
 ls = []
 
@@ -273,6 +277,7 @@ for l in [0, .1, 1, 2, 3, 4, 5, 10, 25, 50, 100]:
         best_weights = beta
         best_l = l
         best_validation_MSE = MSE(yPredictValidation, validation_labels.values)
+        best_training_MSE = MSE(yPredict, y)
 
 print ', '.join(str(v) for v in best_weights)
 print '", "'.join(str(v) for v in articleDataDummiesRegression.columns.values)
@@ -280,6 +285,7 @@ print training_MSES
 print validation_MSES
 print test_MSES 
 print best_validation_MSE
+print best_training_MSE
 print best_l 
 
 ### Once more with no text features 
@@ -326,6 +332,7 @@ validation_MSES = []
 test_MSES = []
 best_weights = []
 best_validation_MSE = 100000
+best_training_MSE = 100000
 best_l = 0
 ls = []
 
@@ -350,6 +357,7 @@ for l in [0, .1, 1, 2, 3, 4, 5, 10, 25, 50, 100]:
         best_weights = beta
         best_l = l
         best_validation_MSE = MSE(yPredictValidation, validation_labels.values)
+        best_training_MSE = MSE(yPredict, y)
 
 print ', '.join(str(v) for v in best_weights)
 print '", "'.join(str(v) for v in articleDataDummiesRegression.columns.values)
@@ -357,4 +365,5 @@ print training_MSES
 print validation_MSES
 print test_MSES 
 print best_validation_MSE
+print best_training_MSE
 print best_l 
