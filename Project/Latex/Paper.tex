@@ -369,7 +369,7 @@ Once we have constructed our full set of features, we aim to predict log(article
 \begin{equation}
 \beta = (\mathbf{X}^T\mathbf{X} + \lambda \mathbf{I})^{-1}\mathbf{X}^T\mathbf{y}
 \end{equation}
-where $\mathbf{I}$ is the $k \times k$ identity matrix, and $\lambda$ is our regularization parameter. Setting $\lambda = 0$ corresponds to OLS, whereas non-zero values of $\lambda$ correspond to ridge regression. The motivation for performing ridge regression as opposed to OLS is to not overfit on our data. 
+where $\mathbf{I}$ is the $k \times k$ identity matrix, and $\lambda$ is our regularization parameter. Setting $\lambda = 0$ corresponds to OLS, whereas non-zero values of $\lambda$ correspond to ridge regression. The motivation for performing ridge regression as opposed to OLS is to not overfit on our data \cite{ridgeregressionNotes}. 
 
 In order to choose an appropriate value of $\lambda$, we split our data into a training and validation set. 90\% of the data is allocated to the training set, and 10\% of the data is allocated to the test set. We cross-validate the estimated $\beta$ values on our validation set for each $\lambda$, and choose the value of $\lambda$ that produces the lowest MSE on the validation data.
 
@@ -470,7 +470,7 @@ Another way we could improve our model is to apply a basis expansion to our vari
 Certainly one thing we definitely plan on doing if we end up trying to turn this project into a publishable paper is to include all of the articles in our dataset. With the much greater sample size and the much more expansive corpus from the additional articles, we might expect to see drastically different optimal weights. 
 
 Since we also have Twitter data that tracks every tweet and retweet involving a NYT article, we would like to extend this project to also include our Twitter data. We can then explore many interesting potential cross effects, such as how does the article content predict the amount of Twitter sharing and alternately, how does content of a Tweet predict viewership.
-=======
+
 \section{Division of Labor}
 
 The work for this project was divided as follows. Michael extracted the New York Times contextual data and page view counts and wrote the NYT website scraping script. Dave and Jeremy built out many of the content-driven features and additional contextual features, such as word count, author gender, popularity, and Flesch reading ease. Dave and Jeremy built the implementation and validation of the Naive Bayes classifier, while Michael focused his efforts on the construction and validation of the language model. Dave, along with assistance from Michael, focused on the implementation of OLS and ridge regression, along with validation and discussion of results. Plot generation, table creation, writing, and editing was evenly split between Michael and Extenuating personal circumstances unfortunately prevented Jeremy from contributing to the project as much as originally anticipated.
