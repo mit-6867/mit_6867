@@ -238,9 +238,22 @@ p(\mathbf{x}|C_k) = \frac{\left ( \sum_i x_i \right )!}{\prod_i x_i !} \prod_i p
 
 We coded up a basic implementation of the Naive Bayes algorithm, drawing heavy inspiration from Greg Lamp's 2014 python tutorial on Naive Bayes \cite{NaiveBayes}. In order to get the probabilities $p(C_k)$ and $p_{ki}$, we developed a training set of NY times data by providing 200 articles to workers on Amazon Mechanical Turk. Each turker was asked to score the sentiment toward the subject of the article in question on a scale from -2 to +2, with -2 being extremely negative and +2 being extremely positive. We recorded 5 scores for every article, and calculated the average sentiment reported by the Turkers. We classified any article having an average score greater than 0.5 as `positive'. Any article with an average sentiment less than -0.5 was `negative.' Any other articles were classified as `neutral.' Ultimately, our labels were 66\% neutral, 14.5\% negative, and 19.5\% positive. This is unsurprising, as a newspaper such as the New York Times likely strives for neutrality when reporting on most topics.
 
-We wanted to determine how our Naive Bayes implementation did compared to an off-the-shelf implementation of the same algorithm. In order to do so, we trained NLTK's multinomial Naive Bayes classifier on the same training data, and then evaluated the sentiment of 1,000 articles. A comparison of the two implementations is found below:
+We wanted to determine how our Naive Bayes implementation did compared to an off-the-shelf implementation of the same algorithm. In order to do so, we trained NLTK's multinomial Naive Bayes classifier on the same training data, and then evaluated the sentiment of 1,000 articles. A comparison of the two implementations is found below, where the columns indicate the prediction by the NLTK Naive Bayes implementation and the rows indicate the prediction by our implementation:
 
+\vspace{10 mm}
 
+\begin{tabular}{l | r r r}
+\toprule
+  & negative & neutral & positive\\
+\midrule
+negative & 0 & 54 & 0\\
+neutral & 2 & 894 & 0\\
+positive & 0 & 50 & 0\\
+\end{tabular}
+
+\vspace{10 mm}
+
+Overall, we find 89.4\% agreement between the two algorithms. However, alarmingly, the NLTK implementation seems to predict neutral an overwhelming percentage of the time (99.8\% of the time). This warrants further investigation, and may be due to small differences in implementation, or peculiarities in the sample of 1,000 articles we chose to compare the two algorithms across. In any case, our algorithm seems to be performing in the same neighborhood as the NLTK implementation (if not better), so we feel relatively comfortable moving forward using our sentiment labels.
 
 \subsection{Article Perplexity}
 
