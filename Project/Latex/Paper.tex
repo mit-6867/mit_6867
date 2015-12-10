@@ -182,7 +182,7 @@ In addition to aggregating the counts, when
 In preparing to perform our regression, we construct a number of features, using both the parsed NYT article data and secondary sources. These features include the Flesch reading ease, the (guessed) gender of the author(s), the popularity of the author(s), the sentiment of the article text, the perplexity of the article text, and variables indicating the section the article appeared in and the article's content type. Found below is a full list of these features, as well as the methodology used to construct them and validation of the features, where appropriate.
 
 \begin{description}
-	\item[Flesch Reading Ease] The Flesch reading ease is a metric developed by Flesch in 1948 \cite{flesch1948new}. The score indicates how difficult a piece of English text is to understand. Lower scores correspond to more difficult passages, and the highest score attainable is 120.0. The formula for calculating a passage's Flesch reading ease is
+	\item[Flesch Reading Ease] One can conceive of a few hypotheses that relate the readership of content to the ease with which people can read it. Maybe more complicated pieces of text are more engaging, and are more likely to be read. On the other hand, perhaps pieces of text that are easier to read will be consumed by more people. In order to capture relationships such as these in our data, we include the Flesch reading ease. The Flesch reading ease is a metric developed by Flesch in 1948 \cite{flesch1948new}. The score indicates how difficult a piece of English text is to understand. Lower scores correspond to more difficult passages, and the highest score attainable is 120.0. The formula for calculating a passage's Flesch reading ease is
 	
 	\begin{equation}
 	206.835 - 1.015 \left ( \frac{\textrm{\# words}}{\textrm{\# sentences}} \right ) - 84.6 \left ( \frac{\textrm{\# syllables}}{\textrm{\# words}} \right )
@@ -194,11 +194,11 @@ In preparing to perform our regression, we construct a number of features, using
 	
 	In order to measure something that will serve as a decent proxy for popularity, we programmatically searched for every distinct author in our dataset using Bing, and recorded the number of search results that were returned by the query. In cases where a particular article has more than one distinct author, we calculate an ``effective" popularity by simply calculating the average number of search results over all article authors.
 	
-	\item[Author Gender] We also attempt to construct a feature that indicates the most likely gender of the article author(s). In cases where the gender of the author is unclear (e.g., Robin) or there are likely multiple authors with different genders (e.g., The New York Times Staff), we record a third gender value, ``ambiguous / unknown." 
+	\item[Author Gender] We certainly hope that an author's gender would not have a causal impact on whether or not a particular article gets readership. However, we want to allow for this fact and measure this variable. We do so by constructing a feature that indicates the most likely gender of the article author(s). In cases where the gender of the author is unclear (e.g., Robin) or there are likely multiple authors with different genders (e.g., The New York Times Staff), we record a third gender value, ``ambiguous / unknown." 
 	
 	We construct our gender data by cross-referencing the first names of all of the authors in our dataset against U.S. Social Security Administration baby name data from 1935 to 1997. If over 90\% of the babies with a given name have been male, we assume a given author is male. If over 90\% of the babies with a given name have been female, we assume a given author is female. Otherwise, we record ``ambiguous / unknown."
 	
-	\item[Material Type, Section, Desk, and Article Type] We also include dummy variables including the material type (e.g., `News' or `Obituary'), desk (e.g., `Weekend' or `Real Estate'), article type (`Blog post' or `Article'), and section (e.g., `Movies' or `World').
+	\item[Material Type, Section, Desk, and Article Type] We also include dummy variables including the material type (e.g., `News' or `Obituary'), desk (e.g., `Weekend' or `Real Estate'), article type (`Blog post' or `Article'), and section (e.g., `Movies' or `World'). The hypothesis driving the decision to include these variables is that certain types of content (e.g., political news or international affairs) may be more widely read than local material (such as real estate) or less popular sections of the NY Times (e.g., the sports section).
 
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{author_popularity_histogram.png}
@@ -374,6 +374,25 @@ Section: Corrections & -0.167\\
 Desk: BookReview & -0.167\\
 \end{tabular}
 \end{center}
+
+\subsection{The Effect of Textual Features}
+
+Given the large amount of work we put into building numerous text-based features (such as the trigram neural network perplexity, the sentiment, and the Flesch reading ease), we may want to evaluate how impactful these various features actually are in our regression. How much incremental reduction in MSE are we getting by including them? We first re-run the exact same regression specification, but instead of using the trigram perplexity calculated from our neural network, we instead use the simple bigram perplexity discussed earlier in this paper. We find that this actually causes the MSE to decrease, from 2.392 to 2.389. This small, but modest change suggests that there is almost no incremental value from the neural network feature.
+
+Now, we might ask if any text features are adding much value. Particularly given that, in general, their magnitude is dwarved by the magnitudes of the contextual features when looking at feature weights, we might expect that text features do not add much. When removing perplexity, sentiment, reading ease, and word count features from our regression, we find that the MSE increases, from 2.392 to 2.502. This is result is encouraging, as it suggests that even if text features aren't doing much, they're doing something! Removing them from our model leads to a 4.6\% increase in the MSE.
+
+\begin{table}[hbt]
+\caption{Comparison of MSEs for different model specifications}
+\centering
+\begin{tabular}{ccc}
+\toprule
+NN Trigram & Bigram & No Text\\
+\midrule
+2.392 & 2.389 &  2.502 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 %------------------------------------------------
 \phantomsection
 \section*{Acknowledgments} % The \section*{} command stops section numbering
