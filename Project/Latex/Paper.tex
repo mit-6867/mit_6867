@@ -51,15 +51,16 @@
 %	ARTICLE INFORMATION
 %----------------------------------------------------------------------------------------
 
-\JournalInfo{6.867 Final Paper} % Journal information
+\JournalInfo{6.864/6.867 Final Paper} % Journal information
 \Archive{} % Additional notes (e.g. copyright, DOI, review/research article)
 
 \PaperTitle{How Does Content Drive Viewership?} % Article title
 
-\Authors{Dave Holtz\textsuperscript{1}, Jeremy Yang\textsuperscript{2*}, Michael Zhao\textsuperscript{3}} % Authors
+\Authors{Dave Holtz\textsuperscript{1}, Jeremy Yang\textsuperscript{2}, Michael Zhao\textsuperscript{3*}} % Authors
 \affiliation{\textsuperscript{1}\textit{dholtz@mit.edu}}
 \affiliation{\textsuperscript{2}\textit{zheny@mit.edu}} 
 \affiliation{\textsuperscript{3}\textit{mfzhao@mit.edu}}
+\affiliation{\textsuperscript{*}\textit{Michael is also using this project to fulfill Final Project requirements for both 6.864 as well as 6.867. Dave and Jeremy are only using this project for 6.867.}}
 
 \Keywords{} % Keywords - if you don't want any simply remove all the text between the curly brackets
 \newcommand{\keywordname}{Keywords} % Defines the keywords heading name
@@ -68,8 +69,7 @@
 %	ABSTRACT
 %----------------------------------------------------------------------------------------
 
-\Abstract{Why do some webpages receive massive numbers of page views? To determine how content drives viewership, we construct a unique dataset of all articles published by the New York Times (NYT) in August 2013. Our dataset is built from 2 major components, the NYT's internal web traffic data and article content data parsed from the NYT website. We use the internal web traffic data to accurately track the number of page views of each article as well as construct a set of robust control variables such as the desk and section of each article. To build content features, we use various machine learning and statistical natural language processing techniques on our parsed article content data and construct features such as article perplexity, sentiment, reading difficulty, and indicators that denote the presence of pictures, videos, etc. Additionally, we have access to the NYT's internal website traffic data. We feed all of our constructed features to into a predictive regression model. We find [MAJOR RESULTS HERE].
-}
+\Abstract{Why do some webpages receive massive numbers of page views? To determine how content drives viewership, we construct a unique dataset of all articles published by the New York Times (NYT) in August 2013. Our dataset is built from 2 major components, the NYT's internal web traffic data and article content data parsed from the NYT website. We use the internal web traffic data to accurately track the number of page views of each article as well as construct a set of robust control variables such as the desk and section of each article. To build content features, we use various machine learning and statistical natural language processing techniques on our parsed article content data and construct features such as article perplexity, sentiment, reading difficulty, and indicators that denote the presence of pictures, videos, etc. Additionally, we have access to the NYT's internal website traffic data. We feed all of our constructed features to into a predictive regression model. We find that our textual features modestly improve our predictive power. However, there are still many textual features we've not yet explored due to time constraints. We believe that adding these additional features may offer more significant improvements in performance.}
 
 %----------------------------------------------------------------------------------------
 
@@ -98,9 +98,9 @@ A similar study by Berger and Milkman (2012) \cite{berger2012makes} examines the
 
 \section{Data}
 \subsection{NYT Internal Web Traffic Data}
-Our NYT internal web traffic dataset is a record of all individual user activity on the NYT website covering the period of April 3rd, 2013 to October 31st, 2013. This activity data is stored as individual lines of json and includes who (if available) accessed what page at what time. Overall, it is over 20 terabytes in size and contains over 3 billion page views\footnote{Not all page views are content views, for example, some events that are also tracked are searches, or user account settings.} Since the scope of this dataset is so large, we initially restrict this project to a single month, August 2013. 
+Our NYT internal web traffic dataset is a record of all individual user activity on the NYT website covering the period of April 3rd, 2013 to October 31st, 2013. This activity data is stored as individual lines of json and includes who (if available) accessed what page at what time. Overall, it is over 20 terabytes in size and contains over 3 billion page views. It's important to note that not all page views are content views, for example, some events that are also tracked are searches, or user account settings. Since the scope of this dataset is so large, we initially restrict this project to a single month, August 2013, with plans of including the entire dataset for future work. 
 
-We limit our dataset to consist of pages that only contain articles or blogposts published during the month of August. We parse the data to obtain a list of urls, which need to be stripped of potential garbage. After cleaning up the url data, we are left with 6682 unique pieces of content. We then parse our dataset and aggregate the number of counts each url receives. In order to make the comparison between articles fairer since an article that's been out longer will have more page views on average, we only count the number of page views received up to 7 days after publication\footnote{Given that page views tend to sharply drop off soon after publication since recency is quite important to the News, the number of page views obtained during the 7 days after an article is published represents the vast majority (usually well over 90\%) of total page views an article receives.}. In total, our data consists of over 250 million page views. As seen in Figure 1 below, the distribution of page views is highly skewed with very heavy tails. After applying a log transformation (as seen in Figure 2), our distribution looks considerably more normal. 
+We further constrain our dataset to only include articles or blogposts published during the month of August since these are the pieces of content that have machine parsable text data. For the sake of brevity, we use articles to refer to both articles and blogposts unless we explicitly state otherwise. We make a basic first pass through the data to simply to obtain a list of urls. After cleaning up the url data to make sure we had each url mapped to a unique piece of content, we were left with a total of 6682 urls. We then parse our dataset and aggregate the number of counts each url receives. In order to make the comparison between articles fairer since an article that's been out longer will have more page views on average, we only count the number of page views received up to 7 days after publication. Given that page views tend to sharply drop off soon after publication since recency is quite important to the News, the number of page views obtained during the 7 days after an article is published represents the vast majority (usually well over 90\%) of total page views an article receives. In total, our data consists of 248,161,455 page views. As seen in Figure 1 below, the distribution of page views is highly skewed with very heavy tails. After applying a log transformation (as seen in Figure 2), our distribution looks considerably more normal. 
 
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{pageviews_hist}
@@ -113,17 +113,15 @@ We limit our dataset to consist of pages that only contain articles or blogposts
 \centering
 \begin{tabular}{rr}
 \toprule
-Total Page Views  &  248161455\\
-\midrule
 Min               &  1\\
 Max               &  2545288\\  
 Mean              &  37138.8\\
 Median            &  10298.5\\
-Std. Dev.         &  88972.9\\
-Skewness          &  9.52191\\
-Kurtosis          &  173.061\\
+StDev.         &  88972.9\\
+Skew          &  9.52191\\
+Kurt.          &  173.061\\
 \midrule
-Observations &  6682\\
+Obs &  6682\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -143,19 +141,20 @@ Min               &  0\\
 Max               &  14.74975\\  
 Mean              &  9.122868\\
 Median            &  9.239754\\
-Std. Dev.         &  2.028668\\
-Skewness          &  -1.270368\\
-Kurtosis          &  3.800911\\
+StDev.            &  2.028668\\
+Skew              &  -1.270368\\
+Kurt.             &  3.800911\\
 \midrule
-Observations &  6682\\
+Obs &  6682\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 
-In addition to aggregating the counts, when 
+In addition to aggregating the counts, when parser the internal web traffic data, we made sure to store various relevant article meta-data features such as the headline, time of publishing, authors, section, desk, and the NYT's internal article content description tags (if available\footnote{by this we mean that the NYT only produces these content tags only for some articles, its not a question of whether the data is available to us}).
 
 \subsection{Parsed NYT Article Content Data}
+Unfortunately, the NYT internal web traffic data does not the actual content displayed on each webpage, which is a very important aspect of our project. To resolve this issue, we used the python library ``newspaper". This library helped to scrape the html from the NYT website and extract all the raw textual data from the html. We further used some regular expressions to clean up what the library missed. In total, our 6682 articles contain 4,685,021 words of text.  We find that the distribution of article length, much like the distribution of page views, is highly skewed. We again apply a log transformation. Histograms and various summary statistics of for the distribution of article length and log article length are provided below:
 
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{wordcount_hist}
@@ -163,11 +162,49 @@ In addition to aggregating the counts, when
 \label{fig:pv_hist}
 \end{figure}
 
+\begin{table}[hbt]
+\caption{Log Page Views Distribution Summary Statistics}
+\centering
+\begin{tabular}{rr}
+\toprule
+Min               &  7\\
+Max               &  8941\\  
+Mean              &  701.1405\\
+Median            &  625\\
+StDev.            &  591.9535\\
+Skew              &  3.335127\\
+Kurt.             &  24.35949\\
+\midrule
+Obs &  6682\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{log_wordcount_hist}
 \caption{Histogram of Articles by Log Word Count}
 \label{fig:lpv_hist}
 \end{figure}
+
+\begin{table}[hbt]
+\caption{Log Page Views Distribution Summary Statistics}
+\centering
+\begin{tabular}{rr}
+\toprule
+Min               &  1.945910\\
+Max               &  9.098403\\  
+Mean              &  6.181044\\
+Median            &  6.437751\\
+StDev.            &  1.004414\\
+Skew              &  -1.178993\\
+Kurt.             &  1.944611\\
+\midrule
+Obs &  6682\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+In addition to extracting the raw text data, we made sure to check if the articles contained non-textual content such as pictures or videos. We created indicator variables that denote the presence of such content within an article.
 
 %\begin{figure*}[ht]\centering % Using \begin{figure*} makes the figure take up the entire width of the page
 %\includegraphics[width=\linewidth]{view}
@@ -249,6 +286,7 @@ We wanted to determine how our Naive Bayes implementation did compared to an off
 negative & 0 & 54 & 0\\
 neutral & 2 & 894 & 0\\
 positive & 0 & 50 & 0\\
+\bottomrule
 \end{tabular}
 
 \vspace{10 mm}
@@ -264,7 +302,7 @@ where $n$ is the length of the article, and $p(w_i)$ is the probability of the $
 
 As for out paper, we consider a couple of choices for our language model. First, we build a simple bi-gram language to establish a baseline. We also build more sophisticated word vector based n-gram neural network language models.
 
-We split our articles into training (~70\%), validation (~15\%), and test sets (~15\%). We build our language model corpus only from the text of the articles in the training dataset. To estimate a bigram model, we simply need to compute the counts in our training corpus. Specifically, the probability of some word $w_i$ conditional on its preceding word $w_{i-1}$ is given by:
+We split our articles into training (~70\%), validation (~15\%), and test sets (~15\%). We build our language model corpus only from the text of the articles in the training dataset. In order to keep the size of our vocabulary relatively manageable, we ignore any case sensitivities (so ``Cat" is the same as ``cat"). Furthermore, we only include a word if it appears at least 5 times. Words that don't make this cutoff are mapped to a generic ``rare word" indicator. Lastly, we also map any numbers (that is actual numbers with digits, not number written with words) to a generic ``number" indicator. This leaves us with a vocabulary size $|V|$ of 29359. To estimate a bigram model, we simply need to compute the counts in our training corpus. Specifically, the probability of some word $w_i$ conditional on its preceding word $w_{i-1}$ is given by:
 \begin{equation}
 p(w_i|w_{i-1}) = \frac{\textnormal{count}(w_{i-1},w_i)}{\textnormal{count}}
 \end{equation}
@@ -272,20 +310,20 @@ However, its reasonable to expect that there might be bigrams in the development
 \begin{equation}
 p(w_i|w_{i-1}) = \frac{\textnormal{count}(w_{i-1},w_i) + \alpha}{\textnormal{count} + \alpha |V|}
 \end{equation}
-where $|V|$ is the size of the vocabulary. This smoothing actually has quite a nice Bayesian interpretation as well. In the bigram case, we can say that words follow a multinomial distribution conditional on its preceding word. The smoothed language model 
+This smoothing actually has quite a nice Bayesian interpretation as well. In the bigram case, we can say that words follow a multinomial distribution conditional on its preceding word. The smoothed language model 
 
 Essentially, is we're applying a symmetric dirichlet prior with parameter $\alpha$ to each of these multinomial distributions. 
 
 We use our validation set to determine the optimal value of of $\alpha$ by seeing what value of $\alpha$ minimizes the negative average log-likelihood per word (NALL) of our validation corpus:
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{bigram_add_a.png}
-\caption{Average Negative Log-Likelihood per Word as a Function of $\alpha$}
+\caption{Negative Average Log-Likelihood per Word as a Function of $\alpha$}
 \label{fig:fre_hist}
 \end{figure}
 Here we see exactly what we should expect. The NALL on the training corpus is lower than the NALL on the validation corpus. Furthermore, the NALL on our training corpus monotonically increases as we increase $alpha$ while the NALL on the validation corpus initially decreases hits a minimum, and starts to increase. For our language model, the optimal $\alpha$ is 0.004. This produces the following NALLs for our 3 corpora:
 
 \begin{table}[hbt]
-\caption{NALL for Bigram Language Model with Smoothing}
+\caption{Bigram Language Model with Smoothing Negative Average Log-Likelihood}
 \centering
 \begin{tabular}{ccc}
 \toprule
@@ -306,64 +344,40 @@ One criticism of standard n-gram language models is that they are rather sensiti
 
 Hence, we build word vector n-gram neural network models to see if we can achieve better performance. By using dense word vectors rather than one-hot encodings to represent words, we're able to more accurately represent the ``similarity" of words. For example, ``coffee" is more similar to ``tea" that it is to ``car". Rather astonishingly, these word vector values can be trained through back propagation just like the weights in a neural network just as long as they're randomly initiated! 
 
- In particular, we train both a bigram neural network language model and a trigram neural network language model. In both cases, we use word vectors of length 10 (for the bigram NN, our input layer is size 10 and for the trigram NN, the input layer is size 20) that map to a single hidden layer with 10 hidden units with a tanh activation function. The hidden layer is then connected to the output layer which is the size of our vocabulary with a softmax activation function. Given that we want to also train our word vectors, we use stochastic adaptive gradient descent. We purposefully keep our network relatively small since our data set is rather large and training even this small neural network takes considerable time. 
+ In particular, we train both a bigram neural network language model and a trigram neural network language model. In both cases, we use word vectors of length 10 (so for the bigram NN, our input layer is size 10 and for the trigram NN, the input layer is size 20) that map to a single hidden layer with 10 hidden units with a tanh activation function. The hidden layer is then connected to the output layer which is the size of our vocabulary with a softmax activation function. Given that we want to also train our word vectors, we use stochastic adaptive gradient descent. We purposefully keep our network relatively small since our data set is rather large and training even this small neural network takes considerable time. 
  
- Unfortunately, our neural networks are still in the process of training. Due to various complications, we were not able to train our model for as long as we would've liked. Couple this with the fact that our training corpus contains over 3,000,000 observations and each complete pass through it takes approximately 4.5 hours, means that as of writing this paper, we've only completed 4 full passes. However, our neural network is working as intended and with each pass through the training data, we see decreasing NALL:
+ Unfortunately, our neural networks are still in the process of training. Due to various complications, we were not able to train our model for as long as we would've liked. Couple this with the fact that our training corpus contains over 3,000,000 observations and each complete pass through it takes approximately 4.5 hours, means that as of writing this paper, we've only completed 4 full passes. Unfortunately, as a result of an oversight in the code, we forgot to store the NALL of training data as we complete each full loop. However, we are highly confident our neural network is working as intended since we see we that the NALL decreases every pass on the validation corpus:
  
  %% GRAPH AND TABLE HERE
  
-Despite the fact that our training isn't finished, both our neural network-based language models are already performing better than a standard bi-gram model with smoothing. To build our article perplexity scores, we use the most recently completed pass of our trigram NN language models.
+We fully expect the validation corpus NALL to eventually start increasing once the neural network begins to overfit the training corpus, however we simply haven't reached that point yet. 
+ 
+Despite the fact that our training isn't finished, both our neural network-based language models are already performing better than a standard bi-gram model with smoothing. We build 2 sets of article perplexity scores. One set is derived from the smoothed bigram model to serve as a base comparison. Our other set is derived from the most recently completed pass of our trigram NN language model. We report the following article perplexity scores distribution:
 
-Its important to note however, that we don't necessarily care exactly how good our language model is since we are the language model is an intermediate step to construct a feature for a regression task. It could very well be the case features generated by a worse language model can work just as well as features generated from a better language model if the relative variation of articles is maintained. To test whether a better language model can give us more predictive power, we compute two sets of perplexity scores, one based on the smoothed bigram language model and one based on the trigram neural network language model. 
+%
+
+%% PUT PERPLEXITY DISTRIBUTIONS HERE
+
+%
+
+Its important to note however, that we don't necessarily care exactly how good our language model. Since we only use the language model as an intermediate step to construct a feature for a regression task. It could very well be the case features generated by a worse language model can work just as well as well in the regression task as features generated by a better language model if the relative variation of articles is maintained. To test whether a better language model can give us more predictive power, we compute two sets of perplexity scores, one based on the smoothed bigram language model and one based on the current best trigram neural network language model. 
 
 
 \section{Predictive Regression Model}
 
-Once we have constructed our full set of features, we aim to predict log(article pageviews), $\mathbf{y}$, using our full set of variables, which we include in our design matrix, $\mathbf{X}$. We estimate the feature weights using the closed form solution for both OLS and ridge regression,
-
-\begin{center}
+Once we have constructed our full set of features, we aim to predict log(article pageviews), $\mathbf{y}$, using our full set of variables, which we include in our design matrix, $\mathbf{X}$. We estimate the feature weights using the closed form solution for both OLS and ridge regression:
 \begin{equation}
 \beta = (\mathbf{X}^T\mathbf{X} + \lambda \mathbf{I})^{-1}\mathbf{X}^T\mathbf{y}
 \end{equation}
-\end{center}
-
-\noindent where $\mathbf{I}$ is the $k \times k$ identity matrix, and $\lambda$ is our regularization parameter. Setting $\lambda = 0$ corresponds to OLS, whereas non-zero values of $\lambda$ correspond to ridge regression. The motivation for performing ridge regression as opposed to OLS is to not overfit on our data. 
+where $\mathbf{I}$ is the $k \times k$ identity matrix, and $\lambda$ is our regularization parameter. Setting $\lambda = 0$ corresponds to OLS, whereas non-zero values of $\lambda$ correspond to ridge regression. The motivation for performing ridge regression as opposed to OLS is to not overfit on our data. 
 
 In order to choose an appropriate value of $\lambda$, we split our data into a training and validation set. 90\% of the data is allocated to the training set, and 10\% of the data is allocated to the test set. We cross-validate the estimated $\beta$ values on our validation set for each $\lambda$, and choose the value of $\lambda$ that produces the lowest MSE on the validation data.
 
-The table below displays the 20 feature weights with the largest magnitudes given our model. A bar chart showing the magnitude of all of the weights (excluding the intercept weight) can be found in Figure \ref{fig:lin_reg_weights}.
+The table below displays the 20 feature weights with the largest magnitudes given our model. A bar chart showing the magnitude of all of the weights (excluding the intercept weight) can be found in Figures \ref{fig:lin_reg_weights1} and \ref{fig:lin_reg_weights2}.
 
-\begin{figure*}[ht]\centering
-\includegraphics[width=\linewidth]{feature_weights.png}
-\caption{Linear Regression Feature Weights (excluding intercept term)}
-\label{fig:lin_reg_weights}
-\end{figure*}
-
-\begin{figure*}[ht]\centering
-\includegraphics[width=\linewidth]{feature_weights_contd.png}
-\caption{Linear Regression Feature Weights (excluding intercept term)}
-\label{fig:lin_reg_weights}
-\end{figure*}
-
-Figure \ref{fig:mse_plot} shows the training and holdout MSE for various values of Lambda. There are a few things in this plot worth discussing. First, note that the holdout MSE is consistently lower than the training data MSE. Given the (relatively) small size of our dataset (6,687 observations), this is likely due to the sampling we used to separate our data into training and validation data. However, this shouldn't effect the validity of our cross validation.
-
-Another thing worth noting is that even on the training dataset, the MSE goes down once we choose a non-zero value of $\lambda$. At first, this was surprising to our group, as conceptually OLS is often thought of as the linear regression method that minimizes MSE. However, it is important to note that OLS only holds this distinction amongst unbiased estimators. Hoerl and Kennard (1970) \cite{hoerl1970ridge} prove the existence theorem for ridge regression, which proves that there exists a value of $\lambda$ for which $\beta_{ridge}$ produces a lower MSE than $\beta_{OLS}$. 
-
-Another way of framing this finding is through bias-variance tradeoff. Recall that the MSE can be written as a function of the bias and variance:
-
-\begin{equation}
-MSE = (\textrm{Bias})^2 + \textrm{Var}.
-\end{equation}
-
-\noindent For some values of $\lambda$, ridge regression is able to lower the MSE by decreasing variance, but adding a non-zero bias term. We believe this is what is happening in our data when cycling through different $\lambda$ values.
-
-\begin{figure}[ht]\centering
-\includegraphics[width=\linewidth]{mse_plot.png}
-\caption{The effect of regularization on MSE}
-\label{fig:mse_plot}
-\end{figure}
-
-\begin{center}
+\begin{table}[hbt]
+\caption{20 Most Significant Weights}
+\centering
 \begin{tabular}{lr}
 \toprule
 Feature  &  Weight\\
@@ -388,14 +402,45 @@ Type of Material: News & 0.187\\
 Section: Sports & -0.175\\
 Type of Material: Op-Ed & 0.170\\
 Desk: BookReview & -0.154\\
+\bottomrule
 \end{tabular}
-\end{center}
+\end{table}
+
+\begin{figure*}[ht]\centering
+\includegraphics[width=\linewidth]{feature_weights.png}
+\caption{Linear Regression Feature Weights (excluding intercept term)}
+\label{fig:lin_reg_weights1}
+\end{figure*}
+
+\begin{figure*}[ht]\centering
+\includegraphics[width=\linewidth]{feature_weights_contd.png}
+\caption{Linear Regression Feature Weights (excluding intercept term)}
+\label{fig:lin_reg_weights2}
+\end{figure*}
+
+Figure \ref{fig:mse_plot} shows the training and holdout MSE for various values of Lambda. There are a few things in this plot worth discussing. First, note that the holdout MSE is consistently lower than the training data MSE. Given the (relatively) small size of our dataset (6,687 observations), this is likely due to the sampling we used to separate our data into training and validation data. However, this shouldn't effect the validity of our cross validation.
+
+Another thing worth noting is that even on the training dataset, the MSE goes down once we choose a non-zero value of $\lambda$. At first, this was surprising to our group, as conceptually OLS is often thought of as the linear regression method that minimizes MSE. However, it is important to note that OLS only holds this distinction amongst unbiased estimators. Hoerl and Kennard (1970) \cite{hoerl1970ridge} prove the existence theorem for ridge regression, which proves that there exists a value of $\lambda$ for which $\beta_{ridge}$ produces a lower MSE than $\beta_{OLS}$. 
+
+Another way of framing this finding is through bias-variance tradeoff. Recall that the MSE can be written as a function of the bias and variance:
+
+\begin{equation}
+MSE = (\textrm{Bias})^2 + \textrm{Var}.
+\end{equation}
+
+\noindent For some values of $\lambda$, ridge regression is able to lower the MSE by decreasing variance, but adding a non-zero bias term. We believe this is what is happening in our data when cycling through different $\lambda$ values.
+
+\begin{figure}[ht]\centering
+\includegraphics[width=\linewidth]{mse_plot.png}
+\caption{The effect of regularization on MSE}
+\label{fig:mse_plot}
+\end{figure}
 
 \subsection{The Effect of Textual Features}
 
 Given the large amount of work we put into building numerous text-based features (such as the trigram neural network perplexity, the sentiment, and the Flesch reading ease), we may want to evaluate how impactful these various features actually are in our regression. How much incremental reduction in MSE are we getting by including them? We first re-run the exact same regression specification, but instead of using the trigram perplexity calculated from our neural network, we instead use the simple bigram perplexity discussed earlier in this paper. We find that this actually causes the MSE to decrease, from 2.392 to 2.389. This small, but modest change suggests that there is almost no incremental value from the neural network feature.
 
-Now, we might ask if any text features are adding much value. Particularly given that, in general, their magnitude is dwarfed by the magnitudes of the contextual features when looking at feature weights, we might expect that text features do not add much. When removing perplexity, sentiment, reading ease, and word count features from our regression, we find that the MSE increases, from 2.392 to 2.502. This is result is encouraging, as it suggests that even if text features aren't doing much, they're doing something! Removing them from our model leads to a 4.6\% increase in the MSE.
+Now, we might ask if any text features are adding much value. Particularly given that, in general, the magnitude of their weights is dwarfed by the magnitude of the weights of the contextual features when looking at feature weights, we might expect that text features do not add much. When removing perplexity, sentiment, reading ease, and word count features from our regression, we find that the MSE increases, from 2.392 to 2.502. This is result is encouraging, as it suggests that even if text features aren't doing much, they're doing something! Removing them from our model leads to a 4.6\% increase in the MSE.
 
 \begin{table}[hbt]
 \caption{Comparison of MSEs for different model specifications}
@@ -412,9 +457,9 @@ OLS Val. MSE & 2.407 & 2.405 & 2.506 \\
 \end{table}
 
 \section{Future Work}
-Unfortunately due to time constraints as well as various unanticipated difficulties and technical errors, we were unable to implement all of several important features we had initially wanted to include in our regression. Most notably, this paper in its current state lacks some form of topic modeling which we expect to be a strong predictor of content viewership at least in our context. 
+Unfortunately due to time constraints as well as various unanticipated difficulties and technical errors, we were unable to implement all of several important features we had initially wanted to include in our regression. Most notably, this paper in its current state lacks some form of topic modeling which we expect to be a strong predictor of content viewership at least in our context. We also think the constructing some features using only the headlines might also provide some improvement, especially considering that an article's headline usually ends up being fairly important in a user's decision to click through or not.
 
-There is also much room for improvement with our existing features as well. For example, the perplexity score feature ended providing very little predictive power might be a result of the underlying language model not being good enough, especially considering that the neural network model still hasn't completed its training. Though we did observe that there was virtually no difference moving from the bigram perplexity scores to the trigram neural network perplexity scores, this again might be because the neural network wasn't given sufficient time to train. We can imagine that if we continued training our neural network for several more cycles, we might start to see visible performance gains. 
+There is also much room for improvement with our existing features as well. For example, the perplexity score feature ended providing very little predictive power might be a result of the underlying language model not being good enough, especially considering that the neural network model still hasn't completed its training. Though we did observe that there was virtually no difference moving from the bigram perplexity scores to the trigram neural network perplexity scores, this again might be because the neural network wasn't given sufficient time to train. We can imagine that if we continued training our neural network for several more cycles, we might start to see visible performance gains. Alternatively, we think its likely the its not the perplexity of an article relative to the entire corpus that matters, but rather perplexity relative to other articles that cover the same event or topic. 
 
 Similarly, there is ample room to improve our sentiment analysis methodologies. The training dataset that we generated using mechanical turk is relatively small (200 articles). Because of this, there are currently many words that may have strong conditional probabilities of appearing given a particular article sentiment that simply do not appear in our training data. With more time (and money!), we might be able to expand the size of our training data and consequently include the accuracy of our model. Furthermore, the model currently skips words it hasn't seen in the training corpus - it might make sense to augment our Naive Bayes implementation to incorporate a method such as Laplace smoothing so as to not simply ignore words we haven't seen in our training data.
 
@@ -424,15 +469,17 @@ Another way we could improve our model is to apply a basis expansion to our vari
 
 Certainly one thing we definitely plan on doing if we end up trying to turn this project into a publishable paper is to include all of the articles in our dataset. With the much greater sample size and the much more expansive corpus from the additional articles, we might expect to see drastically different optimal weights. 
 
+Since we also have Twitter data that tracks every tweet and retweet involving a NYT article, we would like to extend this project to also include our Twitter data. We can then explore many interesting potential cross effects, such as how does the article content predict the amount of Twitter sharing and alternately, how does content of a Tweet predict viewership.
+=======
 \section{Division of Labor}
 
-The work for this project was divided as follows. Michael extracted the New York Times contextual data and page view counts. Dave and Jeremy built out many of the content-driven features and additional contextual features, such as word count, author gender, popularity, and Flesch reading ease. Dave and Jeremy built the implementation and validation of the Naive Bayes classifier, and Michael focused his efforts on the construction and validation of the language model. Dave, along with assistance from Michael, focused on the implementation of OLS and ridge regression, along with validation and discussion of results. Extenuating personal circumstances unfortunately prevented Jeremy from contributing to the project as much as originally anticipated.
+The work for this project was divided as follows. Michael extracted the New York Times contextual data and page view counts and wrote the NYT website scraping script. Dave and Jeremy built out many of the content-driven features and additional contextual features, such as word count, author gender, popularity, and Flesch reading ease. Dave and Jeremy built the implementation and validation of the Naive Bayes classifier, while Michael focused his efforts on the construction and validation of the language model. Dave, along with assistance from Michael, focused on the implementation of OLS and ridge regression, along with validation and discussion of results. Plot generation, table creation, writing, and editing was evenly split between Michael and Extenuating personal circumstances unfortunately prevented Jeremy from contributing to the project as much as originally anticipated.
 
 %------------------------------------------------
 \phantomsection
 \section*{Acknowledgments} % The \section*{} command stops section numbering
 
-We would like to thank Professor Sinan Aral for his work procuring this dataset, as well as his limitless advice, mentorship, and patience. We'd also like to thank Paramveer Dhillon for his help.
+We would like to thank Professor Sinan Aral for his work procuring this dataset, as well as his limitless advice, mentorship, and patience. We'd also like to thank Paramveer Dhillon for his useful comments and his work pre-pre-processing our dataset.
 
 \addcontentsline{toc}{section}{Acknowledgments} % Adds this section to the table of contents
 
