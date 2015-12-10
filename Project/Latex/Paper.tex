@@ -98,9 +98,9 @@ A similar study by Berger and Milkman (2012) \cite{berger2012makes} examines the
 
 \section{Data}
 \subsection{NYT Internal Web Traffic Data}
-Our NYT internal web traffic dataset is a record of all individual user activity on the NYT website covering the period of April 3rd, 2013 to October 31st, 2013. This activity data is stored as individual lines of json and includes who (if available) accessed what page at what time. Overall, it is over 20 terabytes in size and contains over 3 billion page views\footnote{Not all page views are content views, for example, some events that are also tracked are searches, or user account settings.} Since the scope of this dataset is so large, we initially restrict this project to a single month, August 2013. 
+Our NYT internal web traffic dataset is a record of all individual user activity on the NYT website covering the period of April 3rd, 2013 to October 31st, 2013. This activity data is stored as individual lines of json and includes who (if available) accessed what page at what time. Overall, it is over 20 terabytes in size and contains over 3 billion page views. It's important to note that not all page views are content views, for example, some events that are also tracked are searches, or user account settings. Since the scope of this dataset is so large, we initially restrict this project to a single month, August 2013, with plans of including the entire dataset for future work. 
 
-We limit our dataset to consist of pages that only contain articles or blogposts published during the month of August. We parse the data to obtain a list of urls, which need to be stripped of potential garbage. After cleaning up the url data, we are left with 6682 unique pieces of content. We then parse our dataset and aggregate the number of counts each url receives. In order to make the comparison between articles fairer since an article that's been out longer will have more page views on average, we only count the number of page views received up to 7 days after publication\footnote{Given that page views tend to sharply drop off soon after publication since recency is quite important to the News, the number of page views obtained during the 7 days after an article is published represents the vast majority (usually well over 90\%) of total page views an article receives.}. In total, our data consists of over 250 million page views. As seen in Figure 1 below, the distribution of page views is highly skewed with very heavy tails. After applying a log transformation (as seen in Figure 2), our distribution looks considerably more normal. 
+We further constrain our dataset to only include articles or blogposts published during the month of August since these are the pieces of content that have machine parsable text data. For the sake of brevity, we use articles to refer to both articles and blogposts unless we explicitly state otherwise. We make a basic first pass through the data to simply to obtain a list of urls. After cleaning up the url data to make sure we had each url mapped to a unique piece of content, we were left with a total of 6682 urls. We then parse our dataset and aggregate the number of counts each url receives. In order to make the comparison between articles fairer since an article that's been out longer will have more page views on average, we only count the number of page views received up to 7 days after publication. Given that page views tend to sharply drop off soon after publication since recency is quite important to the News, the number of page views obtained during the 7 days after an article is published represents the vast majority (usually well over 90\%) of total page views an article receives. In total, our data consists of 248,161,455 page views. As seen in Figure 1 below, the distribution of page views is highly skewed with very heavy tails. After applying a log transformation (as seen in Figure 2), our distribution looks considerably more normal. 
 
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{pageviews_hist}
@@ -113,17 +113,15 @@ We limit our dataset to consist of pages that only contain articles or blogposts
 \centering
 \begin{tabular}{rr}
 \toprule
-Total Page Views  &  248161455\\
-\midrule
 Min               &  1\\
 Max               &  2545288\\  
 Mean              &  37138.8\\
 Median            &  10298.5\\
-Std. Dev.         &  88972.9\\
-Skewness          &  9.52191\\
-Kurtosis          &  173.061\\
+StDev.         &  88972.9\\
+Skew          &  9.52191\\
+Kurt.          &  173.061\\
 \midrule
-Observations &  6682\\
+Obs &  6682\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -143,19 +141,23 @@ Min               &  0\\
 Max               &  14.74975\\  
 Mean              &  9.122868\\
 Median            &  9.239754\\
-Std. Dev.         &  2.028668\\
-Skewness          &  -1.270368\\
-Kurtosis          &  3.800911\\
+StDev.            &  2.028668\\
+Skew              &  -1.270368\\
+Kurt.             &  3.800911\\
 \midrule
-Observations &  6682\\
+Obs &  6682\\
 \bottomrule
 \end{tabular}
 \end{table}
 
 
-In addition to aggregating the counts, when 
+In addition to aggregating the counts, when parser the internal web traffic data, we made sure to store various relevant article meta-data features such as the headline, time of publishing, authors, section, desk, and the NYT's internal article content description tags (if available\footnote{by this we mean that the NYT only produces these content tags only for some articles, its not a question of whether the data is available to us}).
 
 \subsection{Parsed NYT Article Content Data}
+Unfortunately, the NYT internal web traffic data does not the actual content displayed on each webpage, which is a very important aspect of our project. To resolve this issue, we used the python library ``newspaper". This library helped to scrape the html from the NYT website and extract all the raw textual data from the html. We further used some regular expressions to clean up what the library missed. 
+
+
+
 
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{wordcount_hist}
@@ -163,11 +165,47 @@ In addition to aggregating the counts, when
 \label{fig:pv_hist}
 \end{figure}
 
+\begin{table}[hbt]
+\caption{Log Page Views Distribution Summary Statistics}
+\centering
+\begin{tabular}{rr}
+\toprule
+Min               &  7\\
+Max               &  8941\\  
+Mean              &  701.1405\\
+Median            &  625\\
+StDev.            &  591.9535\\
+Skew              &  3.335127\\
+Kurt.             &  24.35949\\
+\midrule
+Obs &  6682\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \begin{figure}[ht]\centering
 \includegraphics[width=\linewidth]{log_wordcount_hist}
 \caption{Histogram of Articles by Log Word Count}
 \label{fig:lpv_hist}
 \end{figure}
+
+\begin{table}[hbt]
+\caption{Log Page Views Distribution Summary Statistics}
+\centering
+\begin{tabular}{rr}
+\toprule
+Min               &  1.945910\\
+Max               &  9.098403\\  
+Mean              &  6.181044\\
+Median            &  6.437751\\
+StDev.            &  1.004414\\
+Skew              &  -1.178993\\
+Kurt.             &  1.944611\\
+\midrule
+Obs &  6682\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 %\begin{figure*}[ht]\centering % Using \begin{figure*} makes the figure take up the entire width of the page
 %\includegraphics[width=\linewidth]{view}
@@ -406,7 +444,7 @@ OLS Val. MSE & 2.407 & 2.405 & 2.506 \\
 \end{table}
 
 \section{Future Work}
-Unfortunately due to time constraints as well as various unanticipated difficulties and technical errors, we were unable to implement all of several important features we had initially wanted to include in our regression. Most notably, this paper in its current state lacks some form of topic modeling which we expect to be a strong predictor of content viewership at least in our context. 
+Unfortunately due to time constraints as well as various unanticipated difficulties and technical errors, we were unable to implement all of several important features we had initially wanted to include in our regression. Most notably, this paper in its current state lacks some form of topic modeling which we expect to be a strong predictor of content viewership at least in our context. We also think the constructing some features using only the headlines might also provide some improvement, especially considering that an article's headline usually ends up being fairly important in a user's decision to click through or not.
 
 There is also much room for improvement with our existing features as well. For example, the perplexity score feature ended providing very little predictive power might be a result of the underlying language model not being good enough, especially considering that the neural network model still hasn't completed its training. Though we did observe that there was virtually no difference moving from the bigram perplexity scores to the trigram neural network perplexity scores, this again might be because the neural network wasn't given sufficient time to train. We can imagine that if we continued training our neural network for several more cycles, we might start to see visible performance gains. 
 
@@ -415,6 +453,8 @@ Similarly, the sentiment analysis has much room for improvement...
 Another way we could improve our model is to apply a basis expansion to our variables to include polynomial and various interaction terms. In many cases, theres no good justification to why a feature is linearly related to the output feature. Hence, applying a polynomial expansion might uncover an entirely different relationship between our dependent variable and its covariates. We also think that interaction terms might provide some significant predictive power. 
 
 Certainly one thing we definitely plan on doing if we end up trying to turn this project into a publishable paper is to include all of the articles in our dataset. With the much greater sample size and the much more expansive corpus from the additional articles, we might expect to see drastically different optimal weights. 
+
+Since we also have Twitter data that tracks every tweet and retweet involving a NYT article, we would like to extend this project to also include our Twitter data. We can then explore many interesting potential cross effects, such as how does the article content predict the amount of Twitter sharing and alternately, how does content of a Tweet predict viewership.
 %------------------------------------------------
 \phantomsection
 \section*{Acknowledgments} % The \section*{} command stops section numbering
