@@ -45,6 +45,10 @@ fleschKincaid = fleschKincaid.ix[:, fleschKincaid.columns - ['index_value']]
 bigramPerplexity = pickle.load(open('bigram-perplexity.pkl', 'rb'))
 articleData = pd.concat([articleData, bigramPerplexity], axis=1)
 
+sentiment_labels = pd.read_csv('../feature_extraction/sentiment/naive_bayes.csv')
+sentiment_labels.columns = ['id', 'sentiment']
+articleData = articleData.merge(sentiment_labels, on=['id'])
+
 def get_author_gender(author_array):
     genders = []
 
@@ -105,7 +109,7 @@ articleData['popularity_pre_log'] = articleData.authors.apply(get_author_popular
 articleData['weekday'] = articleData.publishedDate.apply(get_weekday)
 articleData['timeofday'] = articleData.publishedDate.apply(get_hour_chunk)
 
-dummyColumns = ['typeOfMaterial', 'desk', 'type', 'section', 'author_gender', 'weekday', 'timeofday']
+dummyColumns = ['typeOfMaterial', 'desk', 'type', 'section', 'author_gender', 'weekday', 'timeofday', 'sentiment']
 articleDataDummies = create_dummy_variables(articleData, dummyColumns)
 articleDataDummies = articleDataDummies.merge(fleschKincaid, on=['id'])
 articleDataDummies['flesch-kincaid_score'].fillna(articleDataDummies['flesch-kincaid_score'].median(), inplace=True)
@@ -116,7 +120,7 @@ articleDataDummies['log_wcount'] = articleDataDummies.wcount.apply(np.log)
 
 columnstoRemove = ['authors', 'desFacet', 'geoFacet', 'headline', 'id', 'orgFacet', 'perFacet', 'publishedDate', 
 'count', 'popularity_pre_log', 'log_count', 'author_gender_male', 'desk_Business', 'section_Arts', 'type_Article', 
-'typeOfMaterial_Interview', 'wcount', 'weekday_Friday', 'timeofday_0-5']
+'typeOfMaterial_Interview', 'wcount', 'weekday_Friday', 'timeofday_0-5', 'sentiment_neutral']
 articleDataDummiesRegression = articleDataDummies.ix[:, articleDataDummies.columns - columnstoRemove]
 intercept = pd.Series(np.ones(len(articleDataDummiesRegression)))
 articleDataDummiesRegression = articleDataDummiesRegression.apply(scale_features, axis=0)

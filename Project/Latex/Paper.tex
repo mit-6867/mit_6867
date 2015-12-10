@@ -224,6 +224,20 @@ We also include features that attempt to capture the article sentiment and the a
 
 \subsection{Article Sentiment}
 
+In order to measure article sentiment, we use a Naives Bayes text classification algorithm, as described in Rennie et al (2003) \cite{rennie2003tackling}. We assume that each article in our corpus can belong to one of three classes - `negative' sentiment, `neutral' sentiment, and `positive' sentiment, which we will denote as $C_k$. The Naive Bayes model assumes that the likelihood of observing a given article $\mathbf{x} = (x_1, ..., 1_n)$, where $x_i$ is the number of times that word $i$ appears, is 
+
+\begin{equation}
+p(\mathbf{x}|C_k) = \frac{\left ( \sum_i x_i \right )!}{\prod_i x_i !} \prod_i p_{ki}^{x_i},
+\end{equation} 
+
+\noindent where $p_{ki}$ is the probability of a document of class $K$ including word $i$. Given that we transform this problem into log space, we can compute $\log(p(\mathbf{x}|C_k))$ as 
+
+\begin{equation}
+\log(p(\mathbf{x}|C_k)) = \log ( p(C_k)) + \sum_{i=1}^n x_i \cdot \log(p_{ki}).
+\end{equation}
+
+We coded up a basic implementation of the Naive Bayes algorithm, drawing heavy inspiration from Greg Lamp's 2014 python tutorial on Naive Bayes \cite{NaiveBayes}. In order to get the probabilities $p(C_k)$ and $p_{ki}$, we developed a training set of NY times data by providing 200 articles to workers on Amazon Mechanical Turk. Each turker was asked to score the sentiment toward the subject of the article in question on a scale from -2 to +2, with -2 being extremely negative and +2 being extremely positive. We recorded 5 scores for every article, and calculated the average sentiment reported by the Turkers. We classified any article having an average score greater than 0.5 as `positive'. Any article with an average sentiment less than -0.5 was `negative.' Any other articles were classified as `neutral.' Ultimately, our labels were 66\% neutral, 14.5\% negative, and 19.5\% positive. This is unsurprising, as a newspaper such as the New York Times likely strives for neutrality when reporting on most topics.
+
 \subsection{Article Perplexity}
 
 \section{Predictive Regression Model}
