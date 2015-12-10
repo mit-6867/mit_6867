@@ -329,6 +329,12 @@ The table below displays the 20 feature weights with the largest magnitudes give
 \label{fig:lin_reg_weights}
 \end{figure*}
 
+\begin{figure*}[ht]\centering
+\includegraphics[width=\linewidth]{feature_weights_contd.png}
+\caption{Linear Regression Feature Weights (excluding intercept term)}
+\label{fig:lin_reg_weights}
+\end{figure*}
+
 Figure \ref{fig:mse_plot} shows the training and holdout MSE for various values of Lambda. There are a few things in this plot worth discussing. First, note that the holdout MSE is consistently lower than the training data MSE. Given the (relatively) small size of our dataset (6,687 observations), this is likely due to the sampling we used to separate our data into training and validation data. However, this shouldn't effect the validity of our cross validation.
 
 Another thing worth noting is that even on the training dataset, the MSE goes down once we choose a non-zero value of $\lambda$. At first, this was surprising to our group, as conceptually OLS is often thought of as the linear regression method that minimizes MSE. However, it is important to note that OLS only holds this distinction amongst unbiased estimators. Hoerl and Kennard (1970) \cite{hoerl1970ridge} prove the existence theorem for ridge regression, which proves that there exists a value of $\lambda$ for which $\beta_{ridge}$ produces a lower MSE than $\beta_{OLS}$. 
@@ -384,11 +390,13 @@ Now, we might ask if any text features are adding much value. Particularly given
 \begin{table}[hbt]
 \caption{Comparison of MSEs for different model specifications}
 \centering
-\begin{tabular}{ccc}
+\begin{tabular}{cccc}
 \toprule
-NN Trigram & Bigram & No Text\\
+  & NN Trigram & Bigram & No Text\\
 \midrule
-2.392 & 2.389 &  2.502 \\
+Best Val. MSE & 2.392 & 2.389 &  2.502 \\
+Train. MSE & 2.011 & 2.011 &  2.274 \\
+OLS Val. MSE & 2.407 & 2.405 & 2.506 \\ 
 \bottomrule
 \end{tabular}
 \end{table}
