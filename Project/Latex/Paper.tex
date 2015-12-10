@@ -56,7 +56,7 @@
 
 \PaperTitle{How Does Content Drive Viewership?} % Article title
 
-\Authors{Dave Holtz\textsuperscript{1}, Jeremy Yang\textsuperscript{2}, Michael Zhao\textsuperscript{3}} % Authors
+\Authors{Dave Holtz\textsuperscript{1}, Jeremy Yang\textsuperscript{2*}, Michael Zhao\textsuperscript{3}} % Authors
 \affiliation{\textsuperscript{1}\textit{dholtz@mit.edu}}
 \affiliation{\textsuperscript{2}\textit{zheny@mit.edu}} 
 \affiliation{\textsuperscript{3}\textit{mfzhao@mit.edu}}
@@ -410,14 +410,23 @@ Unfortunately due to time constraints as well as various unanticipated difficult
 
 There is also much room for improvement with our existing features as well. For example, the perplexity score feature ended providing very little predictive power might be a result of the underlying language model not being good enough, especially considering that the neural network model still hasn't completed its training. Though we did observe that there was virtually no difference moving from the bigram perplexity scores to the trigram neural network perplexity scores, this again might be because the neural network wasn't given sufficient time to train. We can imagine that if we continued training our neural network for several more cycles, we might start to see visible performance gains. 
 
-Similarly, the sentiment analysis has much room for improvement...
+Similarly, there is ample room to improve our sentiment analysis methodologies. The training dataset that we generated using mechanical turk is relatively small (200 articles). Because of this, there are currently many words that may have strong conditional probabilities of appearing given a particular article sentiment that simply do not appear in our training data. With more time (and money!), we might be able to expand the size of our training data and consequently include the accuracy of our model. Furthermore, the model currently skips words it hasn't seen in the training corpus - it might make sense to augment our Naive Bayes implementation to incorporate a method such as Laplace smoothing so as to not simply ignore words we haven't seen in our training data.
+
+Furthermore, the current discrepancies between our implementation of Naive Bayes and NLTK's, while not large in magnitude, are alarming. Given more time in the future, we hope to dig deeper into what is happening. Our current hypothesis is that NLTK's implementation of Naive Bayes does not take into account the number of times a particular word appears in a document. Because of this, more distinct informative words are required to move a given article's prediction away from the neutral class, which has an extremely strong prior.
 
 Another way we could improve our model is to apply a basis expansion to our variables to include polynomial and various interaction terms. In many cases, theres no good justification to why a feature is linearly related to the output feature. Hence, applying a polynomial expansion might uncover an entirely different relationship between our dependent variable and its covariates. We also think that interaction terms might provide some significant predictive power. 
 
 Certainly one thing we definitely plan on doing if we end up trying to turn this project into a publishable paper is to include all of the articles in our dataset. With the much greater sample size and the much more expansive corpus from the additional articles, we might expect to see drastically different optimal weights. 
+
+\section{Division of Labor}
+
+The work for this project was divided as follows. Michael extracted the New York Times contextual data and page view counts. Dave and Jeremy built out many of the content-driven features and additional contextual features, such as word count, author gender, popularity, and Flesch reading ease. Dave and Jeremy built the implementation and validation of the Naive Bayes classifier, and Michael focused his efforts on the construction and validation of the language model. Dave, along with assistance from Michael, focused on the implementation of OLS and ridge regression, along with validation and discussion of results. Extenuating personal circumstances unfortunately prevented Jeremy from contributing to the project as much as originally anticipated.
+
 %------------------------------------------------
 \phantomsection
 \section*{Acknowledgments} % The \section*{} command stops section numbering
+
+We would like to thank Professor Sinan Aral for his work procuring this dataset, as well as his limitless advice, mentorship, and patience. We'd also like to thank Paramveer Dhillon for his help.
 
 \addcontentsline{toc}{section}{Acknowledgments} % Adds this section to the table of contents
 
