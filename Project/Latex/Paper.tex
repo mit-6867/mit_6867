@@ -296,6 +296,12 @@ Training &  Validation & Test\\
 \end{tabular}
 \end{table}
 
+\begin{figure}
+\includegraphics[width=\linewidth]{perplexity.png}
+\caption{The distribution of bigram and trigram perplexities}
+\label{fig:perp_hist}
+\end{figure}
+
 One criticism of standard n-gram language models is that they are rather sensitive to the training data. Suppose that two words generally have fairly interchangeable use cases (meaning that the same or similar words tend to appear before these words), for example, ``coffee" and ``tea". Further suppose that for whatever reason, the phrase ``drink coffee" is predominantly featured in the training data but ``drink tea" is not. Then a standard bigram language model would assign a very low probability to ``drink tea" even if the in the training data contains many instances in which they are fairly interchangeable (``buy coffee/tea", ``brew coffee/tea", etc.).
 
 Hence, we build word vector n-gram neural network models to see if we can achieve better performance. By using dense word vectors rather than one-hot encodings to represent words, we're able to more accurately represent the ``similarity" of words. For example, ``coffee" is more similar to ``tea" that it is to ``car". Rather astonishingly, these word vector values can be trained through back propagation just like the weights in a neural network just as long as they're randomly initiated! 
